@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>STORYTELLER - Établi v3.6</title>
+    <title>STORYTELLER - Établi v3.7</title>
     <style>
         :root {
             --bg: #0f0f0f;
@@ -164,17 +164,6 @@
             font-size: 0.85rem;
         }
 
-        .viz-zone {
-            border: 1px dashed #444;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            padding: 10px;
-            gap: 10px;
-        }
-
         #layout-visualizer {
             display: grid;
             gap: 10px;
@@ -183,6 +172,16 @@
             height: 100%;
             min-height: 350px;
         }
+
+        .viz-zone {
+            border: 1px dashed #444;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            padding: 10px;
+        }
     </style>
 </head>
 
@@ -190,7 +189,7 @@
 
     <header>
         <div style="font-size: 1.2rem; font-weight: bold; color: var(--accent);">STORYTELLER <span
-                style="font-weight: normal; color: #555;">v3.6</span></div>
+                style="font-weight: normal; color: #555;">v3.7</span></div>
         <div id="status-bar" style="font-size: 0.85rem;">
             Auteur: <span id="stat-user" style="color:var(--warning)">-</span> |
             Projet: <span id="stat-proj" style="color:var(--danger)">Aucun</span>
@@ -211,8 +210,7 @@
                 style="border: 2px dashed var(--accent); padding: 20px;">
             <div style="text-align: center; margin: 15px 0; color: #666;">— OU —</div>
             <input type="text" id="user-name-init" placeholder="Nom de l'Auteur">
-            <button class="btn-primary" style="width:100%" onclick="initNewSession()">Initialiser un Nouveau
-                Scénario</button>
+            <button class="btn-primary" style="width:100%" onclick="initNewSession()">Nouveau Scénario</button>
         </div>
     </div>
 
@@ -222,10 +220,10 @@
                 <h3>Métadonnées</h3>
                 <div id="proj-details" style="line-height: 1.6; font-size: 0.9rem;"></div>
                 <button class="btn-success" style="width:100%; margin-top:20px" onclick="exportProject()">Exporter le
-                    Projet (JSON)</button>
+                    Projet</button>
             </div>
             <div class="card">
-                <h3>Résumé des Ressources</h3>
+                <h3>Résumé</h3>
                 <div id="dash-stats"></div>
             </div>
         </div>
@@ -234,24 +232,22 @@
     <div id="page-env" class="page">
         <div class="grid-3">
             <div class="col card">
-                <h4>1. Bibliothèques</h4>
+                <h4>1. Biblio</h4>
                 <small>SYS :</small> <input type="file" onchange="loadLib(this, 'SYS')">
                 <small>USR :</small> <input type="file" onchange="loadLib(this, 'USR')">
                 <div id="list-sources" class="scroll-list"></div>
             </div>
             <div class="col card">
-                <h4>2. Palette Scénario</h4>
+                <h4>2. Palette</h4>
                 <div id="list-palette" class="scroll-list"></div>
             </div>
             <div class="col card">
                 <h4>3. Style Rapide</h4>
-                <input type="text" id="new-style-id" placeholder="ID_STYLE">
-                <textarea id="new-style-css" placeholder="CSS (ex: color:red;)"></textarea>
-                <div style="display: flex; gap: 10px;">
-                    <button class="btn-primary" style="flex:1" onclick="addQuickStyle()">Ajouter</button>
-                    <button class="btn-primary" style="flex:1; background:#555"
-                        onclick="resetStyleForm()">Vider</button>
-                </div>
+                <input type="text" id="new-style-id" placeholder="ID">
+                <textarea id="new-style-css" placeholder="CSS"></textarea>
+                <button class="btn-primary" style="width:100%" onclick="addQuickStyle()">Ajouter</button>
+                <button class="btn-primary" style="width:100%; background:#555; margin-top:5px;"
+                    onclick="resetStyleForm()">Vider</button>
             </div>
         </div>
     </div>
@@ -261,7 +257,7 @@
             <div class="col card">
                 <h4 id="base-form-title">Créer ST_Base</h4>
                 <input type="text" id="base-label" placeholder="Label">
-                <textarea id="base-content" placeholder="Contenu..."></textarea>
+                <textarea id="base-content" placeholder="Contenu"></textarea>
                 <div id="base-style-choices" class="scroll-list" style="max-height:100px"></div>
                 <button class="btn-success" style="width:100%; margin-top:10px" id="btn-save-base"
                     onclick="createBase()">Sauvegarder</button>
@@ -270,10 +266,9 @@
             </div>
             <div class="col card">
                 <h4 id="cont-form-title">Créer ST_Container</h4>
-                <input type="text" id="cont-label" placeholder="Nom de la boîte">
+                <input type="text" id="cont-label" placeholder="Label">
                 <select id="cont-style-select"></select>
                 <div class="scroll-list" style="max-height:150px; margin-top:10px;">
-                    <small>Enfants (Bases & Boîtes) :</small>
                     <div id="children-checklist"></div>
                 </div>
                 <button class="btn-success" style="width:100%; margin-top:10px" id="btn-save-cont"
@@ -291,39 +286,26 @@
     <div id="page-layout" class="page">
         <div class="grid-3">
             <div class="col card">
-                <h4>Configuration</h4>
+                <h4>Layout</h4>
                 <select id="select-template" onchange="updateLayoutPreview()">
                     <option value="single">Plein Écran</option>
-                    <option value="split-v">Split Vertical</option>
-                    <option value="split-h">Split Horizontal</option>
-                    <option value="grid">Grille 2x2</option>
+                    <option value="split-v">Split V</option>
+                    <option value="split-h">Split H</option>
+                    <option value="grid">Grille</option>
                 </select>
                 <div id="mapping-area" style="margin-top:20px;"></div>
             </div>
             <div class="col card" style="grid-column: span 2;">
-                <h4>Fond de Scène</h4>
+                <h4>Aperçu</h4>
                 <div id="layout-visualizer"></div>
             </div>
         </div>
     </div>
 
     <script>
-        let db = {
-            project: null,
-            sys: { "NORMAL": "color:#d0d0d0; font-size:1.1rem;", "ALERTE": "color:#e74c3c; font-weight:bold;" },
-            usr: {},
-            modified: false,
-            editing: null
-        };
+        let db = { project: null, sys: {}, usr: {}, modified: false, editing: null };
+        const templates = { "single": ["Zone_Centrale"], "split-v": ["Gauche", "Droite"], "split-h": ["Haut", "Bas"], "grid": ["H_Gauche", "H_Droite", "B_Gauche", "B_Droite"] };
 
-        const templates = {
-            "single": ["Zone_Centrale"],
-            "split-v": ["Gauche", "Droite"],
-            "split-h": ["Haut", "Bas"],
-            "grid": ["H_Gauche", "H_Droite", "B_Gauche", "B_Droite"]
-        };
-
-        // --- NAVIGATION ET CHARGEMENT ---
         function showPage(id) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('nav span').forEach(s => s.classList.remove('active'));
@@ -334,19 +316,15 @@
         }
 
         function loadProject(input) {
-            if (!input.files || input.files.length === 0) return;
             const reader = new FileReader();
             reader.onload = (e) => {
-                try {
-                    db.project = JSON.parse(e.target.result);
-                    if (!db.project.content.st_containers) db.project.content.st_containers = [];
-                    let auth = db.project.metadata.author;
-                    let displayAuthor = (typeof auth === 'object') ? (auth.name || "Auteur") : auth;
-                    document.getElementById('stat-user').innerText = displayAuthor;
-                    document.getElementById('stat-proj').innerText = db.project.metadata.name;
-                    document.getElementById('main-nav').classList.remove('hidden');
-                    showPage('page-dash');
-                } catch (err) { alert("Erreur JSON"); }
+                db.project = JSON.parse(e.target.result);
+                if (!db.project.content.st_containers) db.project.content.st_containers = [];
+                let auth = db.project.metadata.author;
+                document.getElementById('stat-user').innerText = (typeof auth === 'object') ? auth.name : auth;
+                document.getElementById('stat-proj').innerText = db.project.metadata.name;
+                document.getElementById('main-nav').classList.remove('hidden');
+                showPage('page-dash');
             };
             reader.readAsText(input.files[0]);
         }
@@ -359,20 +337,13 @@
             showPage('page-dash');
         }
 
-        // --- RENDU UI ---
         function render() {
             if (!db.project) return;
-            let auth = db.project.metadata.author;
-            let displayName = (typeof auth === 'object') ? (auth.name || "Auteur") : auth;
-            document.getElementById('proj-details').innerHTML = `<b>Projet:</b> ${db.project.metadata.name}<br><b>Auteur:</b> ${displayName}`;
+            const auth = db.project.metadata.author;
+            document.getElementById('proj-details').innerHTML = `<b>Projet:</b> ${db.project.metadata.name}<br><b>Auteur:</b> ${(typeof auth === 'object') ? auth.name : auth}`;
 
-            const palList = document.getElementById('list-palette');
-            const baseStyles = document.getElementById('base-style-choices');
-            const contSelect = document.getElementById('cont-style-select');
-            const childCheck = document.getElementById('children-checklist');
-
-            palList.innerHTML = ""; baseStyles.innerHTML = ""; childCheck.innerHTML = "";
-            contSelect.innerHTML = "<option value=''>-- Style --</option>";
+            const palList = document.getElementById('list-palette'), baseStyles = document.getElementById('base-style-choices'), contSelect = document.getElementById('cont-style-select'), childCheck = document.getElementById('children-checklist');
+            palList.innerHTML = ""; baseStyles.innerHTML = ""; childCheck.innerHTML = ""; contSelect.innerHTML = "<option value=''>-- Style --</option>";
 
             db.project.content.palette.forEach(s => {
                 palList.innerHTML += `<div class="item">${s} <button onclick="remFromPal('${s}')">x</button></div>`;
@@ -380,135 +351,58 @@
                 contSelect.innerHTML += `<option value="${s}">${s}</option>`;
             });
 
-            // RÉCURSION : On liste les Bases ET les Containers comme enfants possibles
-            db.project.content.st_bases.forEach(b => {
-                childCheck.innerHTML += `<div><input type="checkbox" value="${b.label}" class="ch-cb"> [B] ${b.label}</div>`;
-            });
+            db.project.content.st_bases.forEach(b => childCheck.innerHTML += `<div><input type="checkbox" value="${b.label}" class="ch-cb"> [B] ${b.label}</div>`);
             db.project.content.st_containers.forEach(c => {
-                // On évite l'auto-imbrication en modification
                 if (db.editing && db.editing.type === 'cont' && db.project.content.st_containers[db.editing.index].label === c.label) return;
                 childCheck.innerHTML += `<div><input type="checkbox" value="${c.label}" class="ch-cb"> [C] ${c.label}</div>`;
             });
 
-            const invList = document.getElementById('list-inv');
-            invList.innerHTML = "<h5>Stock Global :</h5>";
-            db.project.content.st_bases.forEach((b, i) => {
-                invList.innerHTML += `<div class="item"><span><b>[B]</b> ${b.label}</span><div><button onclick="editObject('base', ${i})">✎</button><button class="btn-danger" style="margin-left:5px; padding:5px 8px;" onclick="deleteObject('base', ${i})">🗑️</button></div></div>`;
-            });
-            db.project.content.st_containers.forEach((c, i) => {
-                invList.innerHTML += `<div class="item"><span><b>[C]</b> ${c.label}</span><div><button onclick="editObject('cont', ${i})">✎</button><button class="btn-danger" style="margin-left:5px; padding:5px 8px;" onclick="deleteObject('cont', ${i})">🗑️</button></div></div>`;
-            });
+            const invList = document.getElementById('list-inv'); invList.innerHTML = "";
+            db.project.content.st_bases.forEach((b, i) => invList.innerHTML += `<div class="item"><span>[B] ${b.label}</span><div><button onclick="editObject('base', ${i})">✎</button><button class="btn-danger" onclick="deleteObject('base', ${i})">🗑️</button></div></div>`);
+            db.project.content.st_containers.forEach((c, i) => invList.innerHTML += `<div class="item"><span>[C] ${c.label}</span><div><button onclick="editObject('cont', ${i})">✎</button><button class="btn-danger" onclick="deleteObject('cont', ${i})">🗑️</button></div></div>`);
 
-            const srcList = document.getElementById('list-sources');
-            srcList.innerHTML = "";
+            const srcList = document.getElementById('list-sources'); srcList.innerHTML = "";
             Object.keys(db.sys).forEach(k => srcList.innerHTML += `<div class="item">SYS:${k} <button onclick="addToPal('SYS:${k}')">+</button></div>`);
             Object.keys(db.usr).forEach(k => srcList.innerHTML += `<div class="item">USR:${k} <button onclick="addToPal('USR:${k}')">+</button></div>`);
         }
 
-        // --- MOTEUR DE RENDU RÉCURSIF ---
+        // --- MOTEUR RÉCURSIF CORRIGÉ v3.7 ---
         function getRecursiveHTML(label) {
             const base = db.project.content.st_bases.find(b => b.label === label);
             const cont = db.project.content.st_containers.find(c => c.label === label);
-
-            if (base) {
-                return `<div style="${getStyle(base.styles.refs[0])}">${base.content}</div>`;
-            } else if (cont) {
-                let html = `<div style="${getStyle(cont.style_ref)}; border:1px solid; padding:10px; width:90%; margin:5px 0;">`;
-                cont.children_refs.forEach(childLabel => {
-                    html += getRecursiveHTML(childLabel);
-                });
-                html += `</div>`;
-                return html;
+            if (base) return `<div style="${getStyle(base.styles.refs[0])}">${base.content}</div>`;
+            if (cont) {
+                const cStyle = getStyle(cont.style_ref);
+                let html = `<div style="${cStyle}; border:1px solid rgba(255,255,255,0.1); padding:10px; width:95%; margin:5px 0; box-sizing:border-box;">`;
+                (cont.children_refs || []).forEach(child => html += getRecursiveHTML(child));
+                return html + `</div>`;
             }
             return "";
         }
 
         function refreshVisualizer() {
             document.querySelectorAll('.zone-mapper').forEach(sel => {
-                const zone = sel.getAttribute('data-zone');
-                const label = sel.value;
-                const vizZone = document.getElementById('viz-' + zone);
-                if (!label) { vizZone.innerHTML = zone; vizZone.style.background = "transparent"; return; }
-                vizZone.innerHTML = getRecursiveHTML(label);
+                const zone = sel.getAttribute('data-zone'), vizZone = document.getElementById('viz-' + zone);
+                if (!sel.value) { vizZone.innerHTML = zone; vizZone.style.background = "transparent"; return; }
+                vizZone.innerHTML = getRecursiveHTML(sel.value);
                 vizZone.style.background = "#111";
             });
         }
 
-        // --- ACTIONS ---
-        function deleteObject(type, index) {
-            if (!confirm("Supprimer l'objet ?")) return;
-            if (type === 'base') db.project.content.st_bases.splice(index, 1);
-            else db.project.content.st_containers.splice(index, 1);
-            render(); if (document.getElementById('page-layout').classList.contains('active')) updateLayoutPreview();
-        }
-
-        function editObject(type, index) {
-            db.editing = { type, index };
-            const obj = (type === 'base') ? db.project.content.st_bases[index] : db.project.content.st_containers[index];
-            showPage('page-inv');
-            if (type === 'base') {
-                document.getElementById('base-label').value = obj.label; document.getElementById('base-content').value = obj.content;
-                document.getElementById('base-form-title').innerText = "Modifier Base";
-                document.getElementById('btn-cancel-base').classList.remove('hidden');
-                document.querySelectorAll('.st-cb').forEach(cb => cb.checked = obj.styles.refs.includes(cb.value));
-            } else {
-                document.getElementById('cont-label').value = obj.label; document.getElementById('cont-style-select').value = obj.style_ref;
-                document.getElementById('cont-form-title').innerText = "Modifier Boîte";
-                document.getElementById('btn-cancel-cont').classList.remove('hidden');
-                document.querySelectorAll('.ch-cb').forEach(cb => cb.checked = obj.children_refs.includes(cb.value));
-            }
-        }
-
-        function cancelEdit(type) {
-            db.editing = null;
-            if (type === 'base') {
-                document.getElementById('base-label').value = ""; document.getElementById('base-content').value = "";
-                document.getElementById('base-form-title').innerText = "Créer Base";
-                document.getElementById('btn-cancel-base').classList.add('hidden');
-                document.querySelectorAll('.st-cb').forEach(cb => cb.checked = false);
-            } else {
-                document.getElementById('cont-label').value = ""; document.getElementById('cont-form-title').innerText = "Créer Boîte";
-                document.getElementById('btn-cancel-cont').classList.add('hidden');
-                document.querySelectorAll('.ch-cb').forEach(cb => cb.checked = false);
-            }
-        }
-
-        function createBase() {
-            const label = document.getElementById('base-label').value;
-            const obj = { label, content: document.getElementById('base-content').value, styles: { refs: Array.from(document.querySelectorAll('.st-cb:checked')).map(c => c.value) } };
-            if (db.editing && db.editing.type === 'base') db.project.content.st_bases[db.editing.index] = obj;
-            else db.project.content.st_bases.push(obj);
-            cancelEdit('base'); render();
-        }
-
-        function createContainer() {
-            const label = document.getElementById('cont-label').value;
-            const obj = { label, style_ref: document.getElementById('cont-style-select').value, children_refs: Array.from(document.querySelectorAll('.ch-cb:checked')).map(c => c.value) };
-            if (db.editing && db.editing.type === 'cont') db.project.content.st_containers[db.editing.index] = obj;
-            else db.project.content.st_containers.push(obj);
-            cancelEdit('cont'); render();
-        }
-
-        function updateLayoutPreview() {
-            const type = document.getElementById('select-template').value;
-            const mappingArea = document.getElementById('mapping-area');
-            const visualizer = document.getElementById('layout-visualizer');
-            mappingArea.innerHTML = "<h5>Affectation :</h5>"; visualizer.innerHTML = "";
-            applyGridStyles(visualizer, type);
-            templates[type].forEach(zone => {
-                mappingArea.innerHTML += `<small>${zone}</small><select class="zone-mapper" data-zone="${zone}" onchange="refreshVisualizer()"><option value="">-- Vide --</option>${db.project.content.st_bases.map(b => `<option value="${b.label}">${b.label}</option>`).join('')}${db.project.content.st_containers.map(c => `<option value="${c.label}">${c.label}</option>`).join('')}</select>`;
-                visualizer.innerHTML += `<div id="viz-${zone}" class="viz-zone">${zone}</div>`;
-            });
-        }
-
-        function getStyle(ref) { if (!ref) return ""; const [lib, key] = ref.split(':'); let css = (lib === 'SYS') ? db.sys[key] : (db.usr[key] ? (db.usr[key].css || db.usr[key]) : ""); return css || ""; }
-        function addQuickStyle() { const id = document.getElementById('new-style-id').value; const css = document.getElementById('new-style-css').value; if (id && css) { db.usr[id] = { css: css }; render(); resetStyleForm(); } }
+        function getStyle(ref) { if (!ref) return ""; const [lib, key] = ref.split(':'); return (lib === 'SYS') ? db.sys[key] : (db.usr[key] ? (db.usr[key].css || db.usr[key]) : ""); }
+        function deleteObject(type, i) { if (confirm("Supprimer?")) { if (type === 'base') db.project.content.st_bases.splice(i, 1); else db.project.content.st_containers.splice(i, 1); render(); } }
+        function editObject(type, i) { db.editing = { type, i }; const obj = (type === 'base') ? db.project.content.st_bases[i] : db.project.content.st_containers[i]; showPage('page-inv'); if (type === 'base') { document.getElementById('base-label').value = obj.label; document.getElementById('base-content').value = obj.content; document.getElementById('btn-cancel-base').classList.remove('hidden'); document.querySelectorAll('.st-cb').forEach(cb => cb.checked = obj.styles.refs.includes(cb.value)); } else { document.getElementById('cont-label').value = obj.label; document.getElementById('cont-style-select').value = obj.style_ref; document.getElementById('btn-cancel-cont').classList.remove('hidden'); document.querySelectorAll('.ch-cb').forEach(cb => cb.checked = obj.children_refs.includes(cb.value)); } }
+        function cancelEdit(t) { db.editing = null; if (t === 'base') { document.getElementById('base-label').value = ""; document.getElementById('base-content').value = ""; document.getElementById('btn-cancel-base').classList.add('hidden'); } else { document.getElementById('cont-label').value = ""; document.getElementById('btn-cancel-cont').classList.add('hidden'); } render(); }
+        function createBase() { const label = document.getElementById('base-label').value; const obj = { label, content: document.getElementById('base-content').value, styles: { refs: Array.from(document.querySelectorAll('.st-cb:checked')).map(c => c.value) } }; if (db.editing) db.project.content.st_bases[db.editing.i] = obj; else db.project.content.st_bases.push(obj); cancelEdit('base'); }
+        function createContainer() { const label = document.getElementById('cont-label').value; const obj = { label, style_ref: document.getElementById('cont-style-select').value, children_refs: Array.from(document.querySelectorAll('.ch-cb:checked')).map(c => c.value) }; if (db.editing) db.project.content.st_containers[db.editing.i] = obj; else db.project.content.st_containers.push(obj); cancelEdit('cont'); }
+        function updateLayoutPreview() { const type = document.getElementById('select-template').value, mappingArea = document.getElementById('mapping-area'), visualizer = document.getElementById('layout-visualizer'); mappingArea.innerHTML = "<h5>Affectation :</h5>"; visualizer.innerHTML = ""; applyGridStyles(visualizer, type); templates[type].forEach(zone => { mappingArea.innerHTML += `<small>${zone}</small><select class="zone-mapper" data-zone="${zone}" onchange="refreshVisualizer()"><option value="">-- Vide --</option>${db.project.content.st_bases.map(b => `<option value="${b.label}">${b.label}</option>`).join('')}${db.project.content.st_containers.map(c => `<option value="${c.label}">${c.label}</option>`).join('')}</select>`; visualizer.innerHTML += `<div id="viz-${zone}" class="viz-zone">${zone}</div>`; }); }
+        function applyGridStyles(el, t) { el.style.display = "grid"; const l = { "single": "1fr/1fr", "split-v": "1fr/1fr 1fr", "split-h": "1fr 1fr/1fr", "grid": "1fr 1fr/1fr 1fr" }; const [r, c] = l[t].split('/'); el.style.gridTemplateRows = r; el.style.gridTemplateColumns = c; }
+        function addQuickStyle() { const id = document.getElementById('new-style-id').value, css = document.getElementById('new-style-css').value; if (id && css) { db.usr[id] = { css }; render(); resetStyleForm(); } }
         function resetStyleForm() { document.getElementById('new-style-id').value = ""; document.getElementById('new-style-css').value = ""; }
-        function applyGridStyles(el, type) { el.style.display = "grid"; const layouts = { "single": "1fr/1fr", "split-v": "1fr/1fr 1fr", "split-h": "1fr 1fr/1fr", "grid": "1fr 1fr/1fr 1fr" }; const [rows, cols] = layouts[type].split('/'); el.style.gridTemplateRows = rows; el.style.gridTemplateColumns = cols; }
         function addToPal(id) { if (!db.project.content.palette.includes(id)) { db.project.content.palette.push(id); render(); } }
         function remFromPal(id) { db.project.content.palette = db.project.content.palette.filter(x => x !== id); render(); }
-        function loadLib(input, type) { const reader = new FileReader(); reader.onload = (e) => { if (type === 'SYS') db.sys = JSON.parse(e.target.result); else db.usr = JSON.parse(e.target.result); render(); }; reader.readAsText(input.files[0]); }
-        function exportProject() { const blob = new Blob([JSON.stringify(db.project, null, 2)], { type: 'application/json' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = db.project.metadata.name.replace(/\s+/g, '_') + ".json"; a.click(); }
+        function loadLib(input, t) { const reader = new FileReader(); reader.onload = (e) => { if (t === 'SYS') db.sys = JSON.parse(e.target.result); else db.usr = JSON.parse(e.target.result); render(); }; reader.readAsText(input.files[0]); }
+        function exportProject() { const blob = new Blob([JSON.stringify(db.project, null, 2)], { type: 'application/json' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = db.project.metadata.name + ".json"; a.click(); }
     </script>
 </body>
 
