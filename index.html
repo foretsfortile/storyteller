@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>STORYTELLER - Établi v3.5</title>
+    <title>STORYTELLER - Établi v3.6</title>
     <style>
         :root {
             --bg: #0f0f0f;
@@ -190,7 +190,7 @@
 
     <header>
         <div style="font-size: 1.2rem; font-weight: bold; color: var(--accent);">STORYTELLER <span
-                style="font-weight: normal; color: #555;">v3.5</span></div>
+                style="font-weight: normal; color: #555;">v3.6</span></div>
         <div id="status-bar" style="font-size: 0.85rem;">
             Auteur: <span id="stat-user" style="color:var(--warning)">-</span> |
             Projet: <span id="stat-proj" style="color:var(--danger)">Aucun</span>
@@ -226,7 +226,7 @@
             </div>
             <div class="card">
                 <h3>Résumé des Ressources</h3>
-                <div id="dash-stats" style="display: flex; gap: 20px; margin-top:20px;"></div>
+                <div id="dash-stats"></div>
             </div>
         </div>
     </div>
@@ -235,8 +235,8 @@
         <div class="grid-3">
             <div class="col card">
                 <h4>1. Bibliothèques</h4>
-                <small>Style_Library (SYS) :</small> <input type="file" onchange="loadLib(this, 'SYS')">
-                <small>Auteur_Library (USR) :</small> <input type="file" onchange="loadLib(this, 'USR')">
+                <small>SYS :</small> <input type="file" onchange="loadLib(this, 'SYS')">
+                <small>USR :</small> <input type="file" onchange="loadLib(this, 'USR')">
                 <div id="list-sources" class="scroll-list"></div>
             </div>
             <div class="col card">
@@ -272,8 +272,8 @@
                 <h4 id="cont-form-title">Créer ST_Container</h4>
                 <input type="text" id="cont-label" placeholder="Nom de la boîte">
                 <select id="cont-style-select"></select>
-                <div class="scroll-list" style="max-height:100px; margin-top:10px;">
-                    <small>Enfants (Bases) :</small>
+                <div class="scroll-list" style="max-height:150px; margin-top:10px;">
+                    <small>Enfants (Bases & Boîtes) :</small>
                     <div id="children-checklist"></div>
                 </div>
                 <button class="btn-success" style="width:100%; margin-top:10px" id="btn-save-cont"
@@ -340,15 +340,13 @@
                 try {
                     db.project = JSON.parse(e.target.result);
                     if (!db.project.content.st_containers) db.project.content.st_containers = [];
-
                     let auth = db.project.metadata.author;
                     let displayAuthor = (typeof auth === 'object') ? (auth.name || "Auteur") : auth;
-
                     document.getElementById('stat-user').innerText = displayAuthor;
                     document.getElementById('stat-proj').innerText = db.project.metadata.name;
                     document.getElementById('main-nav').classList.remove('hidden');
                     showPage('page-dash');
-                } catch (err) { alert("Erreur de lecture du JSON"); }
+                } catch (err) { alert("Erreur JSON"); }
             };
             reader.readAsText(input.files[0]);
         }
@@ -361,15 +359,13 @@
             showPage('page-dash');
         }
 
-        // --- MOTEUR DE RENDU UI ---
+        // --- RENDU UI ---
         function render() {
             if (!db.project) return;
-
             let auth = db.project.metadata.author;
             let displayName = (typeof auth === 'object') ? (auth.name || "Auteur") : auth;
             document.getElementById('proj-details').innerHTML = `<b>Projet:</b> ${db.project.metadata.name}<br><b>Auteur:</b> ${displayName}`;
 
-            // Palette et Formulaires
             const palList = document.getElementById('list-palette');
             const baseStyles = document.getElementById('base-style-choices');
             const contSelect = document.getElementById('cont-style-select');
@@ -384,62 +380,79 @@
                 contSelect.innerHTML += `<option value="${s}">${s}</option>`;
             });
 
+            // RÉCURSION : On liste les Bases ET les Containers comme enfants possibles
             db.project.content.st_bases.forEach(b => {
-                childCheck.innerHTML += `<div><input type="checkbox" value="${b.label}" class="ch-cb"> ${b.label}</div>`;
+                childCheck.innerHTML += `<div><input type="checkbox" value="${b.label}" class="ch-cb"> [B] ${b.label}</div>`;
+            });
+            db.project.content.st_containers.forEach(c => {
+                // On évite l'auto-imbrication en modification
+                if (db.editing && db.editing.type === 'cont' && db.project.content.st_containers[db.editing.index].label === c.label) return;
+                childCheck.innerHTML += `<div><input type="checkbox" value="${c.label}" class="ch-cb"> [C] ${c.label}</div>`;
             });
 
-            // Stock Global avec Suppression
             const invList = document.getElementById('list-inv');
-            invList.innerHTML = "<h5>Objets Disponibles :</h5>";
+            invList.innerHTML = "<h5>Stock Global :</h5>";
             db.project.content.st_bases.forEach((b, i) => {
-                invList.innerHTML += `<div class="item">
-                    <span><b>[B]</b> ${b.label}</span>
-                    <div>
-                        <button onclick="editObject('base', ${i})">✎</button>
-                        <button class="btn-danger" style="margin-left:5px; padding:5px 8px;" onclick="deleteObject('base', ${i})">🗑️</button>
-                    </div>
-                </div>`;
+                invList.innerHTML += `<div class="item"><span><b>[B]</b> ${b.label}</span><div><button onclick="editObject('base', ${i})">✎</button><button class="btn-danger" style="margin-left:5px; padding:5px 8px;" onclick="deleteObject('base', ${i})">🗑️</button></div></div>`;
             });
             db.project.content.st_containers.forEach((c, i) => {
-                invList.innerHTML += `<div class="item">
-                    <span><b>[C]</b> ${c.label}</span>
-                    <div>
-                        <button onclick="editObject('cont', ${i})">✎</button>
-                        <button class="btn-danger" style="margin-left:5px; padding:5px 8px;" onclick="deleteObject('cont', ${i})">🗑️</button>
-                    </div>
-                </div>`;
+                invList.innerHTML += `<div class="item"><span><b>[C]</b> ${c.label}</span><div><button onclick="editObject('cont', ${i})">✎</button><button class="btn-danger" style="margin-left:5px; padding:5px 8px;" onclick="deleteObject('cont', ${i})">🗑️</button></div></div>`;
             });
 
-            // Bibliothèques
             const srcList = document.getElementById('list-sources');
             srcList.innerHTML = "";
             Object.keys(db.sys).forEach(k => srcList.innerHTML += `<div class="item">SYS:${k} <button onclick="addToPal('SYS:${k}')">+</button></div>`);
             Object.keys(db.usr).forEach(k => srcList.innerHTML += `<div class="item">USR:${k} <button onclick="addToPal('USR:${k}')">+</button></div>`);
         }
 
-        // --- GESTION DES OBJETS ---
+        // --- MOTEUR DE RENDU RÉCURSIF ---
+        function getRecursiveHTML(label) {
+            const base = db.project.content.st_bases.find(b => b.label === label);
+            const cont = db.project.content.st_containers.find(c => c.label === label);
+
+            if (base) {
+                return `<div style="${getStyle(base.styles.refs[0])}">${base.content}</div>`;
+            } else if (cont) {
+                let html = `<div style="${getStyle(cont.style_ref)}; border:1px solid; padding:10px; width:90%; margin:5px 0;">`;
+                cont.children_refs.forEach(childLabel => {
+                    html += getRecursiveHTML(childLabel);
+                });
+                html += `</div>`;
+                return html;
+            }
+            return "";
+        }
+
+        function refreshVisualizer() {
+            document.querySelectorAll('.zone-mapper').forEach(sel => {
+                const zone = sel.getAttribute('data-zone');
+                const label = sel.value;
+                const vizZone = document.getElementById('viz-' + zone);
+                if (!label) { vizZone.innerHTML = zone; vizZone.style.background = "transparent"; return; }
+                vizZone.innerHTML = getRecursiveHTML(label);
+                vizZone.style.background = "#111";
+            });
+        }
+
+        // --- ACTIONS ---
         function deleteObject(type, index) {
-            if (!confirm("Supprimer cet objet du stock ?")) return;
+            if (!confirm("Supprimer l'objet ?")) return;
             if (type === 'base') db.project.content.st_bases.splice(index, 1);
             else db.project.content.st_containers.splice(index, 1);
-            db.modified = true; render();
-            if (document.getElementById('page-layout').classList.contains('active')) updateLayoutPreview();
+            render(); if (document.getElementById('page-layout').classList.contains('active')) updateLayoutPreview();
         }
 
         function editObject(type, index) {
             db.editing = { type, index };
             const obj = (type === 'base') ? db.project.content.st_bases[index] : db.project.content.st_containers[index];
             showPage('page-inv');
-
             if (type === 'base') {
-                document.getElementById('base-label').value = obj.label;
-                document.getElementById('base-content').value = obj.content;
+                document.getElementById('base-label').value = obj.label; document.getElementById('base-content').value = obj.content;
                 document.getElementById('base-form-title').innerText = "Modifier Base";
                 document.getElementById('btn-cancel-base').classList.remove('hidden');
                 document.querySelectorAll('.st-cb').forEach(cb => cb.checked = obj.styles.refs.includes(cb.value));
             } else {
-                document.getElementById('cont-label').value = obj.label;
-                document.getElementById('cont-style-select').value = obj.style_ref;
+                document.getElementById('cont-label').value = obj.label; document.getElementById('cont-style-select').value = obj.style_ref;
                 document.getElementById('cont-form-title').innerText = "Modifier Boîte";
                 document.getElementById('btn-cancel-cont').classList.remove('hidden');
                 document.querySelectorAll('.ch-cb').forEach(cb => cb.checked = obj.children_refs.includes(cb.value));
@@ -454,8 +467,7 @@
                 document.getElementById('btn-cancel-base').classList.add('hidden');
                 document.querySelectorAll('.st-cb').forEach(cb => cb.checked = false);
             } else {
-                document.getElementById('cont-label').value = "";
-                document.getElementById('cont-form-title').innerText = "Créer Boîte";
+                document.getElementById('cont-label').value = ""; document.getElementById('cont-form-title').innerText = "Créer Boîte";
                 document.getElementById('btn-cancel-cont').classList.add('hidden');
                 document.querySelectorAll('.ch-cb').forEach(cb => cb.checked = false);
             }
@@ -463,94 +475,36 @@
 
         function createBase() {
             const label = document.getElementById('base-label').value;
-            const content = document.getElementById('base-content').value;
-            const styles = Array.from(document.querySelectorAll('.st-cb:checked')).map(c => c.value);
-            const obj = { label, content, styles: { refs: styles } };
+            const obj = { label, content: document.getElementById('base-content').value, styles: { refs: Array.from(document.querySelectorAll('.st-cb:checked')).map(c => c.value) } };
             if (db.editing && db.editing.type === 'base') db.project.content.st_bases[db.editing.index] = obj;
             else db.project.content.st_bases.push(obj);
-            db.modified = true; cancelEdit('base'); render();
+            cancelEdit('base'); render();
         }
 
         function createContainer() {
             const label = document.getElementById('cont-label').value;
-            const style = document.getElementById('cont-style-select').value;
-            const children = Array.from(document.querySelectorAll('.ch-cb:checked')).map(c => c.value);
-            const obj = { label, style_ref: style, children_refs: children };
+            const obj = { label, style_ref: document.getElementById('cont-style-select').value, children_refs: Array.from(document.querySelectorAll('.ch-cb:checked')).map(c => c.value) };
             if (db.editing && db.editing.type === 'cont') db.project.content.st_containers[db.editing.index] = obj;
             else db.project.content.st_containers.push(obj);
-            db.modified = true; cancelEdit('cont'); render();
+            cancelEdit('cont'); render();
         }
 
-        // --- MISE EN PAGE ---
         function updateLayoutPreview() {
             const type = document.getElementById('select-template').value;
             const mappingArea = document.getElementById('mapping-area');
             const visualizer = document.getElementById('layout-visualizer');
-            mappingArea.innerHTML = "<h5>Affectation :</h5>";
-            visualizer.innerHTML = "";
+            mappingArea.innerHTML = "<h5>Affectation :</h5>"; visualizer.innerHTML = "";
             applyGridStyles(visualizer, type);
-
             templates[type].forEach(zone => {
-                mappingArea.innerHTML += `<small>${zone}</small><select class="zone-mapper" data-zone="${zone}" onchange="refreshVisualizer()">
-                    <option value="">-- Vide --</option>
-                    ${db.project.content.st_bases.map(b => `<option value="${b.label}">${b.label}</option>`).join('')}
-                    ${db.project.content.st_containers.map(c => `<option value="${c.label}">${c.label}</option>`).join('')}
-                </select>`;
+                mappingArea.innerHTML += `<small>${zone}</small><select class="zone-mapper" data-zone="${zone}" onchange="refreshVisualizer()"><option value="">-- Vide --</option>${db.project.content.st_bases.map(b => `<option value="${b.label}">${b.label}</option>`).join('')}${db.project.content.st_containers.map(c => `<option value="${c.label}">${c.label}</option>`).join('')}</select>`;
                 visualizer.innerHTML += `<div id="viz-${zone}" class="viz-zone">${zone}</div>`;
             });
         }
 
-        function refreshVisualizer() {
-            document.querySelectorAll('.zone-mapper').forEach(sel => {
-                const zone = sel.getAttribute('data-zone');
-                const label = sel.value;
-                const vizZone = document.getElementById('viz-' + zone);
-                if (!label) { vizZone.innerHTML = zone; vizZone.style.background = "transparent"; return; }
-
-                const base = db.project.content.st_bases.find(b => b.label === label);
-                const cont = db.project.content.st_containers.find(c => c.label === label);
-
-                if (base) {
-                    vizZone.innerHTML = `<div style="${getStyle(base.styles.refs[0])}">${base.content}</div>`;
-                } else if (cont) {
-                    let html = `<div style="${getStyle(cont.style_ref)}; border:1px solid; padding:10px; width:90%;">`;
-                    cont.children_refs.forEach(childLabel => {
-                        const child = db.project.content.st_bases.find(b => b.label === childLabel);
-                        if (child) html += `<div style="${getStyle(child.styles.refs[0])}">${child.content}</div>`;
-                    });
-                    html += `</div>`;
-                    vizZone.innerHTML = html;
-                }
-                vizZone.style.background = "#111";
-            });
-        }
-
-        // --- STYLES ET UTILS ---
-        function getStyle(ref) {
-            if (!ref) return "";
-            const [lib, key] = ref.split(':');
-            let css = (lib === 'SYS') ? db.sys[key] : (db.usr[key] ? (db.usr[key].css || db.usr[key]) : "");
-            return css || "";
-        }
-
-        function addQuickStyle() {
-            const id = document.getElementById('new-style-id').value;
-            const css = document.getElementById('new-style-css').value;
-            if (id && css) { db.usr[id] = { css: css }; render(); resetStyleForm(); }
-        }
-
-        function resetStyleForm() {
-            document.getElementById('new-style-id').value = "";
-            document.getElementById('new-style-css').value = "";
-        }
-
-        function applyGridStyles(el, type) {
-            el.style.display = "grid";
-            const layouts = { "single": "1fr/1fr", "split-v": "1fr/1fr 1fr", "split-h": "1fr 1fr/1fr", "grid": "1fr 1fr/1fr 1fr" };
-            const [rows, cols] = layouts[type].split('/');
-            el.style.gridTemplateRows = rows; el.style.gridTemplateColumns = cols;
-        }
-
+        function getStyle(ref) { if (!ref) return ""; const [lib, key] = ref.split(':'); let css = (lib === 'SYS') ? db.sys[key] : (db.usr[key] ? (db.usr[key].css || db.usr[key]) : ""); return css || ""; }
+        function addQuickStyle() { const id = document.getElementById('new-style-id').value; const css = document.getElementById('new-style-css').value; if (id && css) { db.usr[id] = { css: css }; render(); resetStyleForm(); } }
+        function resetStyleForm() { document.getElementById('new-style-id').value = ""; document.getElementById('new-style-css').value = ""; }
+        function applyGridStyles(el, type) { el.style.display = "grid"; const layouts = { "single": "1fr/1fr", "split-v": "1fr/1fr 1fr", "split-h": "1fr 1fr/1fr", "grid": "1fr 1fr/1fr 1fr" }; const [rows, cols] = layouts[type].split('/'); el.style.gridTemplateRows = rows; el.style.gridTemplateColumns = cols; }
         function addToPal(id) { if (!db.project.content.palette.includes(id)) { db.project.content.palette.push(id); render(); } }
         function remFromPal(id) { db.project.content.palette = db.project.content.palette.filter(x => x !== id); render(); }
         function loadLib(input, type) { const reader = new FileReader(); reader.onload = (e) => { if (type === 'SYS') db.sys = JSON.parse(e.target.result); else db.usr = JSON.parse(e.target.result); render(); }; reader.readAsText(input.files[0]); }
