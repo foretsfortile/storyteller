@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>STORYTELLER - Établi v4.1</title>
+    <title>STORYTELLER - Établi v4.2</title>
     <style>
         :root {
             --bg: #0f0f0f;
@@ -140,12 +140,6 @@
             font-size: 0.85rem;
         }
 
-        .badge {
-            font-weight: bold;
-            margin-right: 5px;
-            font-family: monospace;
-        }
-
         #layout-visualizer {
             display: grid;
             gap: 15px;
@@ -162,7 +156,6 @@
             align-items: center;
             justify-content: center;
             overflow: hidden;
-            position: relative;
         }
 
         .hidden {
@@ -175,7 +168,7 @@
 
     <header>
         <div style="font-size: 1.2rem; font-weight: bold; color: var(--accent);">STORYTELLER <span
-                style="font-weight: normal; color: #444;">v4.1</span></div>
+                style="font-weight: normal; color: #444;">v4.2</span></div>
         <div id="status-bar" style="font-size: 0.85rem;">Projet: <span id="stat-proj"
                 style="color:var(--warning)">Aucun</span></div>
     </header>
@@ -199,7 +192,7 @@
 
     <div id="page-dash" class="page">
         <div class="card" style="max-width: 500px;">
-            <h3>Détails</h3>
+            <h3>Détails du projet</h3>
             <div id="details-box"></div>
             <button class="btn-success" onclick="exportProject()" style="margin-top: 20px; width:100%;">Exporter le
                 Projet (JSON)</button>
@@ -220,7 +213,7 @@
             <div class="card">
                 <h4>Nouveau Style</h4>
                 <input type="text" id="st-id" placeholder="ID_STYLE">
-                <textarea id="st-css" style="height:80px" placeholder="color: red;"></textarea>
+                <textarea id="st-css" style="height:80px" placeholder="background: red; color: white;"></textarea>
                 <button class="btn-primary" style="width:100%" onclick="addStyle()">Ajouter</button>
             </div>
         </div>
@@ -279,7 +272,7 @@
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('nav span').forEach(s => s.classList.remove('active'));
             document.getElementById(id).classList.add('active');
-            document.getElementById('nav-' + id).classList.add('active');
+            if (document.getElementById('nav-' + id)) document.getElementById('nav-' + id).classList.add('active');
             if (id === 'page-layout') initLayout();
             render();
         }
@@ -293,9 +286,11 @@
         function loadProject(input) {
             const reader = new FileReader();
             reader.onload = (e) => {
-                db.project = JSON.parse(e.target.result);
-                if (!db.project.content.st_containers) db.project.content.st_containers = [];
-                finishLoad();
+                try {
+                    db.project = JSON.parse(e.target.result);
+                    if (!db.project.content.st_containers) db.project.content.st_containers = [];
+                    finishLoad();
+                } catch (err) { alert("Erreur de lecture du fichier JSON."); }
             };
             reader.readAsText(input.files[0]);
         }
@@ -308,9 +303,8 @@
 
         function render() {
             if (!db.project) return;
-            document.getElementById('details-box').innerHTML = `<b>Auteur :</b> ${db.project.metadata.author}<br><b>Bases :</b> ${db.project.content.st_bases.length}<br><b>Boîtes :</b> ${db.project.content.st_containers.length}`;
+            document.getElementById('details-box').innerHTML = `Auteur: ${db.project.metadata.author}<br>Objets: ${db.project.content.st_bases.length + db.project.content.st_containers.length}`;
 
-            // Listes Styles
             const lp = document.getElementById('list-pal'), bs = document.getElementById('base-styles-list'), cs = document.getElementById('cont-style-select');
             lp.innerHTML = ""; bs.innerHTML = ""; cs.innerHTML = "<option value=''>-- Style --</option>";
             db.project.content.palette.forEach(s => {
@@ -319,39 +313,36 @@
                 cs.innerHTML += `<option value="${s}">${s}</option>`;
             });
 
-            // Enfants possibles (Bases + Containers)
             const cc = document.getElementById('cont-children-list'); cc.innerHTML = "";
             db.project.content.st_bases.forEach(b => cc.innerHTML += `<div><input type="checkbox" value="${b.label}" class="cc-cb"> <span style="color:var(--success)">[B]</span> ${b.label}</div>`);
             db.project.content.st_containers.forEach((c, i) => {
                 if (db.editing && db.editing.type === 'cont' && db.editing.idx === i) return;
-                cc.innerHTML += `<div><input type="checkbox" value="${c.label}" class="cc-cb"> <span style="color:var(--accent)">[C]</span> ${c.label}</div>`);
-        });
+                cc.innerHTML += `<div><input type="checkbox" value="${c.label}" class="cc-cb"> <span style="color:var(--accent)">[C]</span> ${c.label}</div>`;
+            });
 
-        // Inventaire avec POUBELLE
-        const fi = document.getElementById('full-inv'); fi.innerHTML = "";
-        db.project.content.st_bases.forEach((b, i) => {
-            fi.innerHTML += `<div class="item"><span><b style="color:var(--success)">[B]</b> ${b.label}</span><div><button onclick="edit('base',${i})">✎</button><button class="btn-danger" style="margin-left:5px" onclick="deleteObj('base',${i})">🗑️</button></div></div>`;
-        });
-        db.project.content.st_containers.forEach((c, i) => {
-            fi.innerHTML += `<div class="item"><span><b style="color:var(--accent)">[C]</b> ${c.label}</span><div><button onclick="edit('cont',${i})">✎</button><button class="btn-danger" style="margin-left:5px" onclick="deleteObj('cont',${i})">🗑️</button></div></div>`;
-        });
+            const fi = document.getElementById('full-inv'); fi.innerHTML = "";
+            db.project.content.st_bases.forEach((b, i) => {
+                fi.innerHTML += `<div class="item"><span><b style="color:var(--success)">[B]</b> ${b.label}</span><div><button onclick="edit('base',${i})">✎</button><button class="btn-danger" style="margin-left:5px" onclick="deleteObj('base',${i})">🗑️</button></div></div>`;
+            });
+            db.project.content.st_containers.forEach((c, i) => {
+                fi.innerHTML += `<div class="item"><span><b style="color:var(--accent)">[C]</b> ${c.label}</span><div><button onclick="edit('cont',${i})">✎</button><button class="btn-danger" style="margin-left:5px" onclick="deleteObj('cont',${i})">🗑️</button></div></div>`;
+            });
 
-        const ll = document.getElementById('list-lib'); ll.innerHTML = "";
-        Object.keys(db.usr).forEach(k => ll.innerHTML += `<div class="item">${k} <button onclick="addPal('${k}')">+</button></div>`);
+            const ll = document.getElementById('list-lib'); ll.innerHTML = "";
+            Object.keys(db.usr).forEach(k => ll.innerHTML += `<div class="item">${k} <button onclick="addPal('${k}')">+</button></div>`);
         }
 
-        // --- SAUVEGARDE ---
         function saveBase() {
-            const label = document.getElementById('base-label').value; if (!label) return;
-            const obj = { label, content: document.getElementById('base-txt').value, styles: { refs: Array.from(document.querySelectorAll('.bs-cb:checked')).map(c => c.value) } };
+            const l = document.getElementById('base-label').value; if (!l) return;
+            const obj = { label: l, content: document.getElementById('base-txt').value, styles: { refs: Array.from(document.querySelectorAll('.bs-cb:checked')).map(c => c.value) } };
             if (db.editing && db.editing.type === 'base') db.project.content.st_bases[db.editing.idx] = obj;
             else db.project.content.st_bases.push(obj);
             resetForms();
         }
 
         function saveCont() {
-            const label = document.getElementById('cont-label').value; if (!label) return;
-            const obj = { label, style_ref: document.getElementById('cont-style-select').value, children_refs: Array.from(document.querySelectorAll('.cc-cb:checked')).map(c => c.value) };
+            const l = document.getElementById('cont-label').value; if (!l) return;
+            const obj = { label: l, style_ref: document.getElementById('cont-style-select').value, children_refs: Array.from(document.querySelectorAll('.cc-cb:checked')).map(c => c.value) };
             if (db.editing && db.editing.type === 'cont') db.project.content.st_containers[db.editing.idx] = obj;
             else db.project.content.st_containers.push(obj);
             resetForms();
@@ -363,26 +354,25 @@
             if (type === 'base') {
                 document.getElementById('base-label').value = obj.label;
                 document.getElementById('base-txt').value = obj.content;
-                setTimeout(() => document.querySelectorAll('.bs-cb').forEach(cb => cb.checked = obj.styles.refs.includes(cb.value)), 10);
+                setTimeout(() => document.querySelectorAll('.bs-cb').forEach(cb => cb.checked = obj.styles.refs.includes(cb.value)), 50);
             } else {
                 document.getElementById('cont-label').value = obj.label;
                 document.getElementById('cont-style-select').value = obj.style_ref;
-                setTimeout(() => document.querySelectorAll('.cc-cb').forEach(cb => cb.checked = obj.children_refs.includes(cb.value)), 10);
+                setTimeout(() => document.querySelectorAll('.cc-cb').forEach(cb => cb.checked = obj.children_refs.includes(cb.value)), 50);
             }
         }
 
-        function deleteObj(type, i) { if (confirm("Supprimer l'objet ?")) { if (type === 'base') db.project.content.st_bases.splice(i, 1); else db.project.content.st_containers.splice(i, 1); render(); } }
+        function deleteObj(type, i) { if (confirm("Supprimer ?")) { if (type === 'base') db.project.content.st_bases.splice(i, 1); else db.project.content.st_containers.splice(i, 1); render(); } }
         function resetForms() { db.editing = null; document.querySelectorAll('input[type=text], textarea, select').forEach(i => i.value = ""); render(); }
 
-        // --- RENDU RÉCURSIF (VRAIE MISE EN PAGE) ---
         function getRecursiveHTML(label) {
             const b = db.project.content.st_bases.find(x => x.label === label);
             const c = db.project.content.st_containers.find(x => x.label === label);
             if (b) return `<div style="${getStyleCSS(b.styles.refs[0])}">${b.content}</div>`;
             if (c) {
-                let html = `<div style="${getStyleCSS(c.style_ref)}; border:1px solid rgba(255,255,255,0.1); padding:10px; margin:5px 0; width:100%; box-sizing:border-box;">`;
-                (c.children_refs || []).forEach(ref => html += getRecursiveHTML(ref));
-                return html + `</div>`;
+                let h = `<div style="${getStyleCSS(c.style_ref)}; border:1px solid rgba(255,255,255,0.1); padding:10px; margin:5px 0; width:100%; box-sizing:border-box;">`;
+                (c.children_refs || []).forEach(ref => h += getRecursiveHTML(ref));
+                return h + `</div>`;
             }
             return "";
         }
@@ -401,8 +391,8 @@
         function refreshViz() {
             document.querySelectorAll('.z-sel').forEach(s => {
                 const z = s.getAttribute('data-z'), v = s.value, el = document.getElementById('viz-' + z);
-                if (v) { el.innerHTML = getRecursiveHTML(v); el.style.background = "#050505"; }
-                else { el.innerHTML = z; el.style.background = "transparent"; }
+                el.innerHTML = v ? getRecursiveHTML(v) : z;
+                el.style.background = v ? "#050505" : "transparent";
             });
         }
 
@@ -411,7 +401,7 @@
         function addPal(k) { if (!db.project.content.palette.includes(k)) { db.project.content.palette.push(k); render(); } }
         function remPal(k) { db.project.content.palette = db.project.content.palette.filter(x => x !== k); render(); }
         function loadLib(i) { const r = new FileReader(); r.onload = (e) => { db.usr = JSON.parse(e.target.result); render(); }; r.readAsText(i.files[0]); }
-        function exportProject() { const b = new Blob([JSON.stringify(db.project, null, 2)], { type: 'application/json' }); const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = "Projet_StoryTeller.json"; a.click(); }
+        function exportProject() { const b = new Blob([JSON.stringify(db.project, null, 2)], { type: 'application/json' }); const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = "Scenario.json"; a.click(); }
     </script>
 </body>
 
