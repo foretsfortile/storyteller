@@ -1,0 +1,38 @@
+{
+  "metadata": {
+    "id": "ST-1767330041391",
+    "name": "Parcours client défaillant CanalBox",
+    "description_short": "Un exemple vécu de defaillances du parcours client chez CanalBox",
+    "description_long": "Le scénario decrit l'experience vécue par l'auteur dans sa relation avec CanalBox lors de ses mutiples tentatives d'obtenir un dépannage.\nL'objectif de ce sc\"nario est de reproduire l'expérience vécue dans tous ses détails et l'impact que ce genre de fonctionnement peut avoir sur le client, les agents de l'operateur lui meme, financierement et sur le plan de la réputation.\nDans une partie du scénario, nous analyseront l'evenement, nous proposerons une solution et presenterons notre vision de la solution a travers la simulation d'un scénario nouvelle génération.",
+    "created_at": "2026-01-02T05:00:41.391Z",
+    "author": {
+      "name": "André Borel",
+      "email": "banco-caraibe@range.fr"
+    }
+  },
+  "content": {
+    "st_bases": [
+      {
+        "label": "Introduction",
+        "content": "Bienvenue a notre nouvelle session",
+        "styles": {
+          "refs": [
+            "SYS:NORMAL"
+          ]
+        }
+      }
+    ],
+    "st_containers": [
+      {
+        "label": "Base",
+        "style_ref": "SYS:NORMAL"
+      }
+    ],
+    "layouts": [],
+    "frames": [],
+    "palette": [
+      "SYS:NORMAL",
+      "SYS:ALERTE"
+    ]
+  }
+}
