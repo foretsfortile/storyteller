@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>STORYTELLER - Établi v4.2</title>
+    <title>STORYTELLER - Blindé v4.3</title>
     <style>
         :root {
             --bg: #0f0f0f;
@@ -137,7 +137,6 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 0.85rem;
         }
 
         #layout-visualizer {
@@ -155,7 +154,6 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            overflow: hidden;
         }
 
         .hidden {
@@ -168,13 +166,13 @@
 
     <header>
         <div style="font-size: 1.2rem; font-weight: bold; color: var(--accent);">STORYTELLER <span
-                style="font-weight: normal; color: #444;">v4.2</span></div>
+                style="font-weight: normal; color: #444;">v4.3</span></div>
         <div id="status-bar" style="font-size: 0.85rem;">Projet: <span id="stat-proj"
                 style="color:var(--warning)">Aucun</span></div>
     </header>
 
     <nav id="main-nav" class="hidden">
-        <span onclick="showPage('page-dash')" id="nav-page-dash" class="active">Tableau de Bord</span>
+        <span onclick="showPage('page-dash')" id="nav-page-dash" class="active">Dashboard</span>
         <span onclick="showPage('page-env')" id="nav-page-env">Environnement</span>
         <span onclick="showPage('page-inv')" id="nav-page-inv">Inventaire</span>
         <span onclick="showPage('page-layout')" id="nav-page-layout">Mise en Page</span>
@@ -184,7 +182,7 @@
         <div style="max-width: 500px; margin: 100px auto;" class="card">
             <h2 style="text-align: center; color: var(--accent);">Accès Établi</h2>
             <input type="file" onchange="loadProject(this)" style="border: 2px dashed #444; padding: 20px;">
-            <p style="text-align: center;">OU</p>
+            <p style="text-align: center;">-- OU --</p>
             <input type="text" id="init-author" placeholder="Nom de l'auteur">
             <button class="btn-primary" style="width: 100%;" onclick="initNew()">Nouveau Projet</button>
         </div>
@@ -192,10 +190,10 @@
 
     <div id="page-dash" class="page">
         <div class="card" style="max-width: 500px;">
-            <h3>Détails du projet</h3>
-            <div id="details-box"></div>
-            <button class="btn-success" onclick="exportProject()" style="margin-top: 20px; width:100%;">Exporter le
-                Projet (JSON)</button>
+            <h3>Projet Actif</h3>
+            <div id="details-box" style="line-height: 2;"></div>
+            <button class="btn-success" onclick="exportProject()" style="margin-top: 20px; width:100%;">Exporter
+                JSON</button>
         </div>
     </div>
 
@@ -207,13 +205,13 @@
                 <div id="list-lib" class="scroll-list"></div>
             </div>
             <div class="card">
-                <h4>Palette Scénario</h4>
+                <h4>Palette</h4>
                 <div id="list-pal" class="scroll-list"></div>
             </div>
             <div class="card">
                 <h4>Nouveau Style</h4>
-                <input type="text" id="st-id" placeholder="ID_STYLE">
-                <textarea id="st-css" style="height:80px" placeholder="background: red; color: white;"></textarea>
+                <input type="text" id="st-id" placeholder="NOM_STYLE">
+                <textarea id="st-css" style="height:80px" placeholder="color: red;"></textarea>
                 <button class="btn-primary" style="width:100%" onclick="addStyle()">Ajouter</button>
             </div>
         </div>
@@ -222,26 +220,26 @@
     <div id="page-inv" class="page">
         <div class="grid-3">
             <div class="card">
-                <h4 id="form-base-title">ST_Base</h4>
-                <input type="text" id="base-label" placeholder="Label">
-                <textarea id="base-txt" style="height:100px" placeholder="Contenu..."></textarea>
-                <div id="base-styles-list" class="scroll-list" style="height: 100px;"></div>
-                <button class="btn-success" onclick="saveBase()"
-                    style="width:100%; margin-top:10px;">Sauvegarder</button>
+                <h4 id="f-b-title">ST_Base</h4>
+                <input type="text" id="b-label" placeholder="Label">
+                <textarea id="b-txt" style="height:100px" placeholder="Contenu..."></textarea>
+                <div id="b-styles" class="scroll-list" style="height: 100px;"></div>
+                <button class="btn-success" onclick="saveBase()" style="width:100%; margin-top:10px;">Sauvegarder
+                    Base</button>
             </div>
             <div class="card">
-                <h4 id="form-cont-title">ST_Container</h4>
-                <input type="text" id="cont-label" placeholder="Label">
-                <select id="cont-style-select"></select>
-                <div id="cont-children-list" class="scroll-list" style="height: 200px; margin-top:10px;"></div>
-                <button class="btn-success" onclick="saveCont()"
-                    style="width:100%; margin-top:10px;">Sauvegarder</button>
+                <h4 id="f-c-title">ST_Container</h4>
+                <input type="text" id="c-label" placeholder="Label">
+                <select id="c-style"></select>
+                <div id="c-children" class="scroll-list" style="height: 200px; margin-top:10px;"></div>
+                <button class="btn-success" onclick="saveCont()" style="width:100%; margin-top:10px;">Sauvegarder
+                    Boîte</button>
             </div>
             <div class="card">
-                <h4>Stock Global</h4>
+                <h4>Inventaire Global</h4>
                 <div id="full-inv" class="scroll-list" style="max-height: 450px;"></div>
                 <button class="btn-primary" style="width:100%; margin-top:10px; background:#444;"
-                    onclick="resetForms()">Annuler / Nouveau</button>
+                    onclick="resetForms()">Nouveau / Annuler</button>
             </div>
         </div>
     </div>
@@ -249,8 +247,8 @@
     <div id="page-layout" class="page">
         <div class="grid-3">
             <div class="card">
-                <h4>Template</h4>
-                <select id="tpl-select" onchange="initLayout()">
+                <h4>Configuration</h4>
+                <select id="tpl-sel" onchange="initLayout()">
                     <option value="single">Plein Écran</option>
                     <option value="split-v">Split V</option>
                     <option value="split-h">Split H</option>
@@ -259,13 +257,14 @@
                 <div id="mapping-list" style="margin-top: 15px;"></div>
             </div>
             <div class="card" style="grid-column: span 2;">
+                <h4>Fond de Scène</h4>
                 <div id="layout-visualizer"></div>
             </div>
         </div>
     </div>
 
     <script>
-        let db = { project: null, usr: {}, editing: null };
+        let db = { project: null, usr: {}, editingId: null };
         const TPLS = { "single": ["Centre"], "split-v": ["Gauche", "Droite"], "split-h": ["Haut", "Bas"], "grid": ["HG", "HD", "BG", "BD"] };
 
         function showPage(id) {
@@ -273,26 +272,26 @@
             document.querySelectorAll('nav span').forEach(s => s.classList.remove('active'));
             document.getElementById(id).classList.add('active');
             if (document.getElementById('nav-' + id)) document.getElementById('nav-' + id).classList.add('active');
-            if (id === 'page-layout') initLayout();
             render();
         }
 
         function initNew() {
-            const a = document.getElementById('init-author').value || "Auteur";
-            db.project = { metadata: { name: "Scenario_HAPPI", author: a }, content: { palette: [], st_bases: [], st_containers: [] } };
+            db.project = {
+                metadata: { name: "Projet", author: document.getElementById('init-author').value || "Auteur" },
+                content: { palette: [], st_bases: [], st_containers: [] },
+                layout: { type: 'single', mapping: {} }
+            };
             finishLoad();
         }
 
         function loadProject(input) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                try {
-                    db.project = JSON.parse(e.target.result);
-                    if (!db.project.content.st_containers) db.project.content.st_containers = [];
-                    finishLoad();
-                } catch (err) { alert("Erreur de lecture du fichier JSON."); }
+            const r = new FileReader();
+            r.onload = (e) => {
+                db.project = JSON.parse(e.target.result);
+                if (!db.project.layout) db.project.layout = { type: 'single', mapping: {} };
+                finishLoad();
             };
-            reader.readAsText(input.files[0]);
+            r.readAsText(input.files[0]);
         }
 
         function finishLoad() {
@@ -303,105 +302,100 @@
 
         function render() {
             if (!db.project) return;
-            document.getElementById('details-box').innerHTML = `Auteur: ${db.project.metadata.author}<br>Objets: ${db.project.content.st_bases.length + db.project.content.st_containers.length}`;
+            document.getElementById('details-box').innerHTML = `<b>Auteur:</b> ${db.project.metadata.author}<br><b>Objets:</b> ${db.project.content.st_bases.length + db.project.content.st_containers.length}`;
 
-            const lp = document.getElementById('list-pal'), bs = document.getElementById('base-styles-list'), cs = document.getElementById('cont-style-select');
+            const lp = document.getElementById('list-pal'), bs = document.getElementById('b-styles'), cs = document.getElementById('c-style');
             lp.innerHTML = ""; bs.innerHTML = ""; cs.innerHTML = "<option value=''>-- Style --</option>";
+
             db.project.content.palette.forEach(s => {
                 lp.innerHTML += `<div class="item">${s} <button onclick="remPal('${s}')">x</button></div>`;
                 bs.innerHTML += `<div><input type="checkbox" value="${s}" class="bs-cb"> ${s}</div>`;
                 cs.innerHTML += `<option value="${s}">${s}</option>`;
             });
 
-            const cc = document.getElementById('cont-children-list'); cc.innerHTML = "";
-            db.project.content.st_bases.forEach(b => cc.innerHTML += `<div><input type="checkbox" value="${b.label}" class="cc-cb"> <span style="color:var(--success)">[B]</span> ${b.label}</div>`);
-            db.project.content.st_containers.forEach((c, i) => {
-                if (db.editing && db.editing.type === 'cont' && db.editing.idx === i) return;
-                cc.innerHTML += `<div><input type="checkbox" value="${c.label}" class="cc-cb"> <span style="color:var(--accent)">[C]</span> ${c.label}</div>`;
+            const cc = document.getElementById('c-children'); cc.innerHTML = "";
+            db.project.content.st_bases.forEach(b => cc.innerHTML += `<div><input type="checkbox" value="${b.id}" class="cc-cb"> [B] ${b.label}</div>`);
+            db.project.content.st_containers.forEach(c => {
+                if (db.editingId !== c.id) cc.innerHTML += `<div><input type="checkbox" value="${c.id}" class="cc-cb"> [C] ${c.label}</div>`;
             });
 
             const fi = document.getElementById('full-inv'); fi.innerHTML = "";
-            db.project.content.st_bases.forEach((b, i) => {
-                fi.innerHTML += `<div class="item"><span><b style="color:var(--success)">[B]</b> ${b.label}</span><div><button onclick="edit('base',${i})">✎</button><button class="btn-danger" style="margin-left:5px" onclick="deleteObj('base',${i})">🗑️</button></div></div>`;
-            });
-            db.project.content.st_containers.forEach((c, i) => {
-                fi.innerHTML += `<div class="item"><span><b style="color:var(--accent)">[C]</b> ${c.label}</span><div><button onclick="edit('cont',${i})">✎</button><button class="btn-danger" style="margin-left:5px" onclick="deleteObj('cont',${i})">🗑️</button></div></div>`;
-            });
+            db.project.content.st_bases.forEach(b => fi.innerHTML += `<div class="item"><span>[B] ${b.label}</span><div><button onclick="edit('base','${b.id}')">✎</button><button class="btn-danger" onclick="del('base','${b.id}')">🗑️</button></div></div>`);
+            db.project.content.st_containers.forEach(c => fi.innerHTML += `<div class="item"><span>[C] ${c.label}</span><div><button onclick="edit('cont','${c.id}')">✎</button><button class="btn-danger" onclick="del('cont','${c.id}')">🗑️</button></div></div>`);
 
-            const ll = document.getElementById('list-lib'); ll.innerHTML = "";
-            Object.keys(db.usr).forEach(k => ll.innerHTML += `<div class="item">${k} <button onclick="addPal('${k}')">+</button></div>`);
+            if (document.getElementById('page-layout').classList.contains('active')) initLayout();
         }
 
         function saveBase() {
-            const l = document.getElementById('base-label').value; if (!l) return;
-            const obj = { label: l, content: document.getElementById('base-txt').value, styles: { refs: Array.from(document.querySelectorAll('.bs-cb:checked')).map(c => c.value) } };
-            if (db.editing && db.editing.type === 'base') db.project.content.st_bases[db.editing.idx] = obj;
+            const label = document.getElementById('b-label').value; if (!label) return;
+            const obj = { id: db.editingId || 'b_' + Date.now(), label, content: document.getElementById('b-txt').value, styles: { refs: Array.from(document.querySelectorAll('.bs-cb:checked')).map(c => c.value) } };
+            if (db.editingId) db.project.content.st_bases = db.project.content.st_bases.map(x => x.id === db.editingId ? obj : x);
             else db.project.content.st_bases.push(obj);
             resetForms();
         }
 
         function saveCont() {
-            const l = document.getElementById('cont-label').value; if (!l) return;
-            const obj = { label: l, style_ref: document.getElementById('cont-style-select').value, children_refs: Array.from(document.querySelectorAll('.cc-cb:checked')).map(c => c.value) };
-            if (db.editing && db.editing.type === 'cont') db.project.content.st_containers[db.editing.idx] = obj;
+            const label = document.getElementById('c-label').value; if (!label) return;
+            const obj = { id: db.editingId || 'c_' + Date.now(), label, style_ref: document.getElementById('c-style').value, children_ids: Array.from(document.querySelectorAll('.cc-cb:checked')).map(c => c.value) };
+            if (db.editingId) db.project.content.st_containers = db.project.content.st_containers.map(x => x.id === db.editingId ? obj : x);
             else db.project.content.st_containers.push(obj);
             resetForms();
         }
 
-        function edit(type, i) {
-            db.editing = { type, idx: i };
-            const obj = (type === 'base') ? db.project.content.st_bases[i] : db.project.content.st_containers[i];
+        function edit(type, id) {
+            db.editingId = id;
+            const obj = type === 'base' ? db.project.content.st_bases.find(x => x.id === id) : db.project.content.st_containers.find(x => x.id === id);
             if (type === 'base') {
-                document.getElementById('base-label').value = obj.label;
-                document.getElementById('base-txt').value = obj.content;
-                setTimeout(() => document.querySelectorAll('.bs-cb').forEach(cb => cb.checked = obj.styles.refs.includes(cb.value)), 50);
+                document.getElementById('b-label').value = obj.label;
+                document.getElementById('b-txt').value = obj.content;
+                setTimeout(() => document.querySelectorAll('.bs-cb').forEach(cb => cb.checked = obj.styles.refs.includes(cb.value)), 10);
             } else {
-                document.getElementById('cont-label').value = obj.label;
-                document.getElementById('cont-style-select').value = obj.style_ref;
-                setTimeout(() => document.querySelectorAll('.cc-cb').forEach(cb => cb.checked = obj.children_refs.includes(cb.value)), 50);
+                document.getElementById('c-label').value = obj.label;
+                document.getElementById('c-style').value = obj.style_ref;
+                setTimeout(() => document.querySelectorAll('.cc-cb').forEach(cb => cb.checked = obj.children_ids.includes(cb.value)), 10);
             }
         }
 
-        function deleteObj(type, i) { if (confirm("Supprimer ?")) { if (type === 'base') db.project.content.st_bases.splice(i, 1); else db.project.content.st_containers.splice(i, 1); render(); } }
-        function resetForms() { db.editing = null; document.querySelectorAll('input[type=text], textarea, select').forEach(i => i.value = ""); render(); }
+        function del(type, id) { if (confirm("Supprimer ?")) { if (type === 'base') db.project.content.st_bases = db.project.content.st_bases.filter(x => x.id !== id); else db.project.content.st_containers = db.project.content.st_containers.filter(x => x.id !== id); render(); } }
+        function resetForms() { db.editingId = null; document.querySelectorAll('input[type=text], textarea, select').forEach(i => i.value = ""); render(); }
 
-        function getRecursiveHTML(label) {
-            const b = db.project.content.st_bases.find(x => x.label === label);
-            const c = db.project.content.st_containers.find(x => x.label === label);
+        function getHTML(id) {
+            const b = db.project.content.st_bases.find(x => x.id === id);
+            const c = db.project.content.st_containers.find(x => x.id === id);
             if (b) return `<div style="${getStyleCSS(b.styles.refs[0])}">${b.content}</div>`;
             if (c) {
-                let h = `<div style="${getStyleCSS(c.style_ref)}; border:1px solid rgba(255,255,255,0.1); padding:10px; margin:5px 0; width:100%; box-sizing:border-box;">`;
-                (c.children_refs || []).forEach(ref => h += getRecursiveHTML(ref));
+                let h = `<div style="${getStyleCSS(c.style_ref)}; border:1px solid rgba(255,255,255,0.1); padding:10px; margin:5px 0; width:100%;">`;
+                (c.children_ids || []).forEach(cid => h += getHTML(cid));
                 return h + `</div>`;
             }
             return "";
         }
 
         function initLayout() {
-            const t = document.getElementById('tpl-select').value, ml = document.getElementById('mapping-list'), lv = document.getElementById('layout-visualizer');
+            const t = document.getElementById('tpl-sel').value, ml = document.getElementById('mapping-list'), lv = document.getElementById('layout-visualizer');
+            db.project.layout.type = t;
             ml.innerHTML = ""; lv.innerHTML = "";
             const grid = { "single": "1fr/1fr", "split-v": "1fr/1fr 1fr", "split-h": "1fr 1fr/1fr", "grid": "1fr 1fr/1fr 1fr" }[t];
             lv.style.display = "grid"; lv.style.gridTemplateRows = grid.split('/')[0]; lv.style.gridTemplateColumns = grid.split('/')[1];
+
             TPLS[t].forEach(z => {
-                ml.innerHTML += `<div style="margin-bottom:5px"><small>${z}</small><select class="z-sel" data-z="${z}" onchange="refreshViz()"><option value="">-</option>${db.project.content.st_bases.map(b => `<option>${b.label}</option>`).join('')}${db.project.content.st_containers.map(c => `<option>${c.label}</option>`).join('')}</select></div>`;
-                lv.innerHTML += `<div id="viz-${z}" class="viz-zone">${z}</div>`;
+                const savedId = db.project.layout.mapping[z] || "";
+                ml.innerHTML += `<small>${z}</small><select class="z-sel" data-z="${z}" onchange="updateMap('${z}', this.value)">
+                    <option value="">-</option>
+                    ${db.project.content.st_bases.map(b => `<option value="${b.id}" ${savedId === b.id ? 'selected' : ''}>[B] ${b.label}</option>`).join('')}
+                    ${db.project.content.st_containers.map(c => `<option value="${c.id}" ${savedId === c.id ? 'selected' : ''}>[C] ${c.label}</option>`).join('')}
+                </select>`;
+                lv.innerHTML += `<div id="viz-${z}" class="viz-zone">${savedId ? getHTML(savedId) : z}</div>`;
             });
         }
 
-        function refreshViz() {
-            document.querySelectorAll('.z-sel').forEach(s => {
-                const z = s.getAttribute('data-z'), v = s.value, el = document.getElementById('viz-' + z);
-                el.innerHTML = v ? getRecursiveHTML(v) : z;
-                el.style.background = v ? "#050505" : "transparent";
-            });
-        }
-
+        function updateMap(zone, id) { db.project.layout.mapping[zone] = id; render(); }
         function getStyleCSS(k) { return db.usr[k] ? (db.usr[k].css || db.usr[k]) : ""; }
         function addStyle() { const id = document.getElementById('st-id').value, css = document.getElementById('st-css').value; if (id && css) { db.usr[id] = css; render(); } }
         function addPal(k) { if (!db.project.content.palette.includes(k)) { db.project.content.palette.push(k); render(); } }
         function remPal(k) { db.project.content.palette = db.project.content.palette.filter(x => x !== k); render(); }
         function loadLib(i) { const r = new FileReader(); r.onload = (e) => { db.usr = JSON.parse(e.target.result); render(); }; r.readAsText(i.files[0]); }
-        function exportProject() { const b = new Blob([JSON.stringify(db.project, null, 2)], { type: 'application/json' }); const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = "Scenario.json"; a.click(); }
+        function exportProject() { const b = new Blob([JSON.stringify(db.project, null, 2)], { type: 'application/json' }); const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = "Projet_V43.json"; a.click(); }
     </script>
 </body>
 
