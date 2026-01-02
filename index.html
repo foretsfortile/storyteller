@@ -3,13 +3,13 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>STORYTELLER - Établi v3.9</title>
+    <title>STORYTELLER - Établi v4.0</title>
     <style>
         :root {
-            --bg: #0f0f0f;
-            --panel: #1a1a1a;
+            --bg: #0a0a0a;
+            --panel: #161616;
             --accent: #00aaff;
-            --text: #d0d0d0;
+            --text: #e0e0e0;
             --success: #27ae60;
             --danger: #e74c3c;
             --warning: #f1c40f;
@@ -24,29 +24,6 @@
             height: 100vh;
             display: flex;
             flex-direction: column;
-        }
-
-        .page {
-            display: none;
-            flex-grow: 1;
-            padding: 20px;
-            animation: fadeIn 0.1s;
-            overflow-y: auto;
-        }
-
-        .page.active {
-            display: flex;
-            flex-direction: column;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-
-            to {
-                opacity: 1;
-            }
         }
 
         header {
@@ -69,19 +46,27 @@
 
         nav span {
             cursor: pointer;
-            padding: 5px 10px;
+            padding: 8px 12px;
             color: #666;
             transition: 0.2s;
+            border-bottom: 2px solid transparent;
         }
 
         nav span.active {
-            border-bottom: 2px solid var(--accent);
             color: var(--accent);
+            border-bottom: 2px solid var(--accent);
             font-weight: bold;
         }
 
-        .hidden {
+        .page {
             display: none;
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .page.active {
+            display: block;
         }
 
         .card {
@@ -96,7 +81,7 @@
         textarea,
         select {
             width: 100%;
-            background: #111;
+            background: #000;
             border: 1px solid #444;
             color: white;
             padding: 10px;
@@ -109,7 +94,7 @@
             cursor: pointer;
             border: none;
             border-radius: 4px;
-            padding: 8px 12px;
+            padding: 10px 15px;
             font-weight: bold;
             transition: 0.2s;
         }
@@ -136,7 +121,7 @@
         }
 
         .scroll-list {
-            background: #222;
+            background: #0a0a0a;
             border-radius: 6px;
             padding: 10px;
             overflow-y: auto;
@@ -145,14 +130,23 @@
         }
 
         .item {
-            background: #333;
+            background: #222;
             margin-bottom: 5px;
-            padding: 8px;
+            padding: 10px;
             border-radius: 4px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             font-size: 0.85rem;
+            border-left: 3px solid transparent;
+        }
+
+        .item-base {
+            border-left-color: var(--success);
+        }
+
+        .item-cont {
+            border-left-color: var(--accent);
         }
 
         #layout-visualizer {
@@ -160,9 +154,8 @@
             gap: 10px;
             padding: 10px;
             background: #000;
-            height: 100%;
-            min-height: 400px;
-            border: 2px solid #222;
+            min-height: 450px;
+            border: 1px solid #333;
         }
 
         .viz-zone {
@@ -171,8 +164,11 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            overflow: hidden;
-            padding: 10px;
+            padding: 15px;
+        }
+
+        .hidden {
+            display: none;
         }
     </style>
 </head>
@@ -181,58 +177,57 @@
 
     <header>
         <div style="font-size: 1.2rem; font-weight: bold; color: var(--accent);">STORYTELLER <span
-                style="font-weight: normal; color: #555;">v3.9</span></div>
+                style="font-weight: normal; color: #444;">v4.0</span></div>
         <div id="status-bar" style="font-size: 0.85rem;">
-            Auteur: <span id="stat-user" style="color:var(--warning)">-</span> |
-            Projet: <span id="stat-proj" style="color:var(--danger)">Aucun</span>
+            Projet: <span id="stat-proj" style="color:var(--warning)">Aucun</span>
         </div>
     </header>
 
     <nav id="main-nav" class="hidden">
-        <span onclick="showPage('page-dash')" id="nav-page-dash" class="active">Dashboard</span>
+        <span onclick="showPage('page-dash')" id="nav-page-dash" class="active">Tableau de Bord</span>
         <span onclick="showPage('page-env')" id="nav-page-env">Environnement</span>
         <span onclick="showPage('page-inv')" id="nav-page-inv">Inventaire</span>
         <span onclick="showPage('page-layout')" id="nav-page-layout">Mise en Page</span>
     </nav>
 
-    <div id="page-auth" class="page active" style="align-items: center; justify-content: center;">
-        <div class="card" style="width: 400px; text-align: center;">
-            <h2 style="color:var(--accent);">Accès Établi</h2>
-            <input type="file" onchange="loadProject(this)"
-                style="border: 2px dashed #444; padding: 20px; cursor: pointer;">
-            <p style="color:#666">-- OU --</p>
-            <input type="text" id="user-name-init" placeholder="Votre Nom">
-            <button class="btn-primary" style="width:100%" onclick="initNewSession()">Créer Nouveau Projet</button>
+    <div id="page-auth" class="page active">
+        <div style="max-width: 500px; margin: 100px auto;" class="card">
+            <h2 style="text-align: center; color: var(--accent);">Établi de Création</h2>
+            <div style="border: 2px dashed #333; padding: 30px; text-align: center;">
+                <p>Charger un fichier .json</p>
+                <input type="file" id="file-input" onchange="loadProject(this)">
+            </div>
+            <p style="text-align: center; margin: 20px;">OU</p>
+            <input type="text" id="init-author" placeholder="Nom de l'auteur">
+            <button class="btn-primary" style="width: 100%;" onclick="initNew()">Nouveau Projet</button>
         </div>
     </div>
 
     <div id="page-dash" class="page">
-        <div class="grid-3" style="grid-template-columns: 1fr 2fr;">
-            <div class="card">
-                <h3>Métadonnées</h3>
-                <p id="proj-details"></p>
-                <button class="btn-success" style="width:100%" onclick="exportProject()">Exporter JSON</button>
-            </div>
+        <div class="card" style="max-width: 600px;">
+            <h3>Détails du Projet</h3>
+            <div id="details-box" style="line-height: 2;"></div>
+            <button class="btn-success" onclick="exportProject()" style="margin-top: 20px;">Exporter le Projet
+                (JSON)</button>
         </div>
     </div>
 
     <div id="page-env" class="page">
         <div class="grid-3">
             <div class="card">
-                <h4>Bibliothèques</h4>
-                <small>Charger USR :</small><input type="file" onchange="loadLib(this, 'USR')">
-                <div id="list-sources" class="scroll-list"></div>
+                <h4>Bibliothèque Style (USR)</h4>
+                <input type="file" onchange="loadLib(this)">
+                <div id="list-lib" class="scroll-list"></div>
             </div>
             <div class="card">
                 <h4>Palette Scénario</h4>
-                <div id="list-palette" class="scroll-list"></div>
+                <div id="list-pal" class="scroll-list"></div>
             </div>
             <div class="card">
-                <h4>Style Rapide</h4>
-                <input type="text" id="new-style-id" placeholder="ID">
-                <textarea id="new-style-css" placeholder="color: red;"></textarea>
-                <button class="btn-primary" onclick="addQuickStyle()">Ajouter</button>
-                <button class="btn-primary" style="background:#444" onclick="resetStyleForm()">Vider</button>
+                <h4>Créateur de Style</h4>
+                <input type="text" id="st-id" placeholder="NOM_STYLE">
+                <textarea id="st-css" placeholder="Ex: background: blue; color: white;"></textarea>
+                <button class="btn-primary" onclick="addStyle()">Ajouter</button>
             </div>
         </div>
     </div>
@@ -240,30 +235,26 @@
     <div id="page-inv" class="page">
         <div class="grid-3">
             <div class="card">
-                <h4 id="base-form-title">Créer ST_Base</h4>
+                <h4 id="form-base-title">ST_Base (Contenu)</h4>
                 <input type="text" id="base-label" placeholder="Label">
-                <textarea id="base-content" placeholder="Texte..."></textarea>
-                <div id="base-style-choices" class="scroll-list" style="max-height:100px"></div>
-                <button class="btn-success" style="width:100%" onclick="saveBase()">Sauvegarder</button>
-                <button id="btn-cancel-base" class="hidden" style="width:100%; margin-top:5px;"
-                    onclick="cancelEdit('base')">Annuler</button>
+                <textarea id="base-txt" placeholder="Votre texte..."></textarea>
+                <div id="base-styles" class="scroll-list" style="height: 80px;"></div>
+                <button class="btn-success" onclick="saveBase()" style="width:100%; margin-top:10px;">Sauvegarder
+                    Base</button>
             </div>
             <div class="card">
-                <h4 id="cont-form-title">Créer ST_Container</h4>
+                <h4 id="form-cont-title">ST_Container (Boîte)</h4>
                 <input type="text" id="cont-label" placeholder="Label de la boîte">
-                <select id="cont-style-select"></select>
-                <div class="scroll-list" style="max-height:150px; margin-top:10px;">
-                    <small>Contenu de la boîte :</small>
-                    <div id="children-checklist"></div>
-                </div>
-                <button class="btn-success" style="width:100%; margin-top:10px"
-                    onclick="saveContainer()">Sauvegarder</button>
-                <button id="btn-cancel-cont" class="hidden" style="width:100%; margin-top:5px;"
-                    onclick="cancelEdit('cont')">Annuler</button>
+                <select id="cont-style"></select>
+                <div id="cont-children" class="scroll-list" style="height: 150px; margin-top:10px;"></div>
+                <button class="btn-success" onclick="saveCont()" style="width:100%; margin-top:10px;">Sauvegarder
+                    Boîte</button>
             </div>
             <div class="card">
-                <h4>Stock Global</h4>
-                <div id="list-inv" class="scroll-list" style="max-height:450px"></div>
+                <h4>Inventaire Global</h4>
+                <div id="full-inv" class="scroll-list" style="max-height: 500px;"></div>
+                <button class="btn-primary" style="width:100%; margin-top:10px; background:#444;"
+                    onclick="resetForms()">Nouveau / Annuler</button>
             </div>
         </div>
     </div>
@@ -271,34 +262,38 @@
     <div id="page-layout" class="page">
         <div class="grid-3">
             <div class="card">
-                <h4>Template</h4>
-                <select id="select-template" onchange="updateLayoutPreview()">
+                <h4>Mise en Scène</h4>
+                <select id="tpl-select" onchange="initLayout()">
                     <option value="single">Plein Écran</option>
-                    <option value="split-v">Split V</option>
-                    <option value="split-h">Split H</option>
-                    <option value="grid">Grille</option>
+                    <option value="split-v">Split Vertical</option>
+                    <option value="split-h">Split Horizontal</option>
+                    <option value="grid">Grille 2x2</option>
                 </select>
-                <div id="mapping-area" style="margin-top:20px;"></div>
+                <div id="mapping-list" style="margin-top: 20px;"></div>
             </div>
             <div class="card" style="grid-column: span 2;">
-                <h4>Aperçu</h4>
                 <div id="layout-visualizer"></div>
             </div>
         </div>
     </div>
 
     <script>
-        let db = { project: null, sys: { "NORMAL": "color:#d0d0d0;" }, usr: {}, editing: null };
-        const templates = { "single": ["Zone_Centrale"], "split-v": ["Gauche", "Droite"], "split-h": ["Haut", "Bas"], "grid": ["HG", "HD", "BG", "BD"] };
+        let db = { project: null, usr: {}, editing: null };
+        const TPLS = { "single": ["Centre"], "split-v": ["Gauche", "Droite"], "split-h": ["Haut", "Bas"], "grid": ["HG", "HD", "BG", "BD"] };
 
         function showPage(id) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('nav span').forEach(s => s.classList.remove('active'));
             document.getElementById(id).classList.add('active');
-            const nav = document.getElementById('nav-' + id);
-            if (nav) nav.classList.add('active');
-            if (id === 'page-layout') updateLayoutPreview();
+            document.getElementById('nav-' + id).classList.add('active');
+            if (id === 'page-layout') initLayout();
             render();
+        }
+
+        function initNew() {
+            const auth = document.getElementById('init-author').value || "Anonyme";
+            db.project = { metadata: { name: "Projet_HAPPI", author: auth }, content: { palette: [], st_bases: [], st_containers: [] } };
+            finishLoad();
         }
 
         function loadProject(input) {
@@ -306,152 +301,127 @@
             reader.onload = (e) => {
                 db.project = JSON.parse(e.target.result);
                 if (!db.project.content.st_containers) db.project.content.st_containers = [];
-                let auth = db.project.metadata.author;
-                document.getElementById('stat-user').innerText = (typeof auth === 'object') ? (auth.name || "Auteur") : auth;
-                document.getElementById('stat-proj').innerText = db.project.metadata.name;
-                document.getElementById('main-nav').classList.remove('hidden');
-                showPage('page-dash');
+                finishLoad();
             };
             reader.readAsText(input.files[0]);
         }
 
-        function initNewSession() {
-            const name = document.getElementById('user-name-init').value || "Auteur";
-            db.project = { metadata: { name: "Projet_HAPPI", author: name }, content: { palette: [], st_bases: [], st_containers: [] } };
-            document.getElementById('stat-user').innerText = name;
+        function finishLoad() {
+            document.getElementById('stat-proj').innerText = db.project.metadata.name;
             document.getElementById('main-nav').classList.remove('hidden');
             showPage('page-dash');
         }
 
-        // --- MOTEUR DE RENDU ---
         function render() {
             if (!db.project) return;
-            const auth = db.project.metadata.author;
-            document.getElementById('proj-details').innerHTML = `<b>Auteur:</b> ${(typeof auth === 'object') ? auth.name : auth}<br><b>Objets:</b> ${db.project.content.st_bases.length + db.project.content.st_containers.length}`;
+            document.getElementById('details-box').innerHTML = `<b>Auteur :</b> ${db.project.metadata.author}<br><b>Bases :</b> ${db.project.content.st_bases.length}<br><b>Boîtes :</b> ${db.project.content.st_containers.length}`;
 
-            const palList = document.getElementById('list-palette'), baseStyles = document.getElementById('base-style-choices'), contSelect = document.getElementById('cont-style-select'), childCheck = document.getElementById('children-checklist');
-            palList.innerHTML = ""; baseStyles.innerHTML = ""; childCheck.innerHTML = ""; contSelect.innerHTML = "<option value=''>-- Style --</option>";
-
+            // Listes Styles
+            const lp = document.getElementById('list-pal'), bs = document.getElementById('base-styles'), cs = document.getElementById('cont-style');
+            lp.innerHTML = ""; bs.innerHTML = ""; cs.innerHTML = "<option value=''>-- Style --</option>";
             db.project.content.palette.forEach(s => {
-                palList.innerHTML += `<div class="item">${s} <button onclick="remFromPal('${s}')">x</button></div>`;
-                baseStyles.innerHTML += `<div><input type="checkbox" value="${s}" class="st-cb"> ${s}</div>`;
-                contSelect.innerHTML += `<option value="${s}">${s}</option>`;
+                lp.innerHTML += `<div class="item">${s} <button onclick="remPal('${s}')">x</button></div>`;
+                bs.innerHTML += `<div><input type="checkbox" value="${s}" class="bs-cb"> ${s}</div>`;
+                cs.innerHTML += `<option value="${s}">${s}</option>`;
             });
 
-            // Liste des enfants pour Container (Bases + autres Containers)
-            db.project.content.st_bases.forEach(b => childCheck.innerHTML += `<div><input type="checkbox" value="${b.label}" class="ch-cb"> [B] ${b.label}</div>`);
-            db.project.content.st_containers.forEach((c, idx) => {
-                if (db.editing && db.editing.type === 'cont' && db.editing.index === idx) return;
-                childCheck.innerHTML += `<div><input type="checkbox" value="${c.label}" class="ch-cb"> [C] ${c.label}</div>`;
+            // Enfants possibles
+            const cc = document.getElementById('cont-children'); cc.innerHTML = "";
+            db.project.content.st_bases.forEach(b => cc.innerHTML += `<div><input type="checkbox" value="${b.label}" class="cc-cb"> [B] ${b.label}</div>`);
+            db.project.content.st_containers.forEach((c, i) => {
+                if (db.editing && db.editing.type === 'cont' && db.editing.idx === i) return;
+                cc.innerHTML += `<div><input type="checkbox" value="${c.label}" class="cc-cb"> [C] ${c.label}</div>`;
             });
 
-            // Stock Global
-            const invList = document.getElementById('list-inv'); invList.innerHTML = "";
-            db.project.content.st_bases.forEach((b, i) => invList.innerHTML += `<div class="item"><span>[B] ${b.label}</span><div><button onclick="editObject('base', ${i})">✎</button><button class="btn-danger" style="margin-left:5px" onclick="deleteObject('base', ${i})">🗑️</button></div></div>`);
-            db.project.content.st_containers.forEach((c, i) => invList.innerHTML += `<div class="item"><span>[C] ${c.label}</span><div><button onclick="editObject('cont', ${i})">✎</button><button class="btn-danger" style="margin-left:5px" onclick="deleteObject('cont', ${i})">🗑️</button></div></div>`);
+            // Inventaire
+            const fi = document.getElementById('full-inv'); fi.innerHTML = "";
+            db.project.content.st_bases.forEach((b, i) => fi.innerHTML += `<div class="item item-base"><span>${b.label}</span><button onclick="edit('base',${i})">✎</button></div>`);
+            db.project.content.st_containers.forEach((c, i) => fi.innerHTML += `<div class="item item-cont"><span>${c.label}</span><button onclick="edit('cont',${i})">✎</button></div>`);
 
-            // Biblio
-            const srcList = document.getElementById('list-sources'); srcList.innerHTML = "";
-            Object.keys(db.sys).forEach(k => srcList.innerHTML += `<div class="item">SYS:${k} <button onclick="addToPal('SYS:${k}')">+</button></div>`);
-            Object.keys(db.usr).forEach(k => srcList.innerHTML += `<div class="item">USR:${k} <button onclick="addToPal('USR:${k}')">+</button></div>`);
+            // Bibliothèque
+            const ll = document.getElementById('list-lib'); ll.innerHTML = "";
+            Object.keys(db.usr).forEach(k => ll.innerHTML += `<div class="item">${k} <button onclick="addPal('${k}')">+</button></div>`);
         }
 
-        // --- LOGIQUE SAUVEGARDE STABLE ---
+        // --- SAUVEGARDE STABLE ---
         function saveBase() {
-            const obj = {
-                label: document.getElementById('base-label').value,
-                content: document.getElementById('base-content').value,
-                styles: { refs: Array.from(document.querySelectorAll('.st-cb:checked')).map(c => c.value) }
-            };
-            if (db.editing && db.editing.type === 'base') db.project.content.st_bases[db.editing.index] = obj;
+            const label = document.getElementById('base-label').value;
+            if (!label) return;
+            const obj = { label, content: document.getElementById('base-txt').value, styles: { refs: Array.from(document.querySelectorAll('.bs-cb:checked')).map(c => c.value) } };
+            if (db.editing && db.editing.type === 'base') db.project.content.st_bases[db.editing.idx] = obj;
             else db.project.content.st_bases.push(obj);
-            cancelEdit('base');
+            resetForms();
         }
 
-        function saveContainer() {
-            const obj = {
-                label: document.getElementById('cont-label').value,
-                style_ref: document.getElementById('cont-style-select').value,
-                children_refs: Array.from(document.querySelectorAll('.ch-cb:checked')).map(c => c.value)
-            };
-            if (db.editing && db.editing.type === 'cont') {
-                db.project.content.st_containers[db.editing.index] = obj;
-            } else {
-                db.project.content.st_containers.push(obj);
-            }
-            cancelEdit('cont');
+        function saveCont() {
+            const label = document.getElementById('cont-label').value;
+            if (!label) return;
+            const obj = { label, style_ref: document.getElementById('cont-style').value, children_refs: Array.from(document.querySelectorAll('.cc-cb:checked')).map(c => c.value) };
+            if (db.editing && db.editing.type === 'cont') db.project.content.st_containers[db.editing.idx] = obj;
+            else db.project.content.st_containers.push(obj);
+            resetForms();
         }
 
-        function editObject(type, i) {
-            db.editing = { type, index: i };
+        function edit(type, i) {
+            db.editing = { type, idx: i };
             const obj = (type === 'base') ? db.project.content.st_bases[i] : db.project.content.st_containers[i];
-            showPage('page-inv');
             if (type === 'base') {
                 document.getElementById('base-label').value = obj.label;
-                document.getElementById('base-content').value = obj.content;
-                document.getElementById('base-form-title').innerText = "Modifier Base";
-                document.getElementById('btn-cancel-base').classList.remove('hidden');
-                document.querySelectorAll('.st-cb').forEach(cb => cb.checked = obj.styles.refs.includes(cb.value));
+                document.getElementById('base-txt').value = obj.content;
+                document.querySelectorAll('.bs-cb').forEach(cb => cb.checked = obj.styles.refs.includes(cb.value));
             } else {
                 document.getElementById('cont-label').value = obj.label;
-                document.getElementById('cont-style-select').value = obj.style_ref;
-                document.getElementById('cont-form-title').innerText = "Modifier Container";
-                document.getElementById('btn-cancel-cont').classList.remove('hidden');
-                document.querySelectorAll('.ch-cb').forEach(cb => cb.checked = obj.children_refs.includes(cb.value));
+                document.getElementById('cont-style').value = obj.style_ref;
+                document.querySelectorAll('.cc-cb').forEach(cb => cb.checked = obj.children_refs.includes(cb.value));
             }
+            render();
         }
 
-        function cancelEdit(t) {
+        function resetForms() {
             db.editing = null;
-            document.getElementById('base-form-title').innerText = "Créer ST_Base";
-            document.getElementById('cont-form-title').innerText = "Créer ST_Container";
-            document.querySelectorAll('input[type=text], textarea').forEach(i => i.value = "");
-            document.querySelectorAll('.hidden').forEach(h => h.classList.add('hidden'));
+            document.querySelectorAll('input[type=text], textarea, select').forEach(i => i.value = "");
             render();
         }
 
-        function deleteObject(type, i) {
-            if (!confirm("Supprimer l'objet ?")) return;
-            if (type === 'base') db.project.content.st_bases.splice(i, 1);
-            else db.project.content.st_containers.splice(i, 1);
-            render();
-        }
-
-        // --- RENDU VISUEL ---
-        function getRecursiveHTML(label) {
+        // --- RENDU RÉCURSIF ---
+        function getHTML(label) {
             const b = db.project.content.st_bases.find(x => x.label === label);
             const c = db.project.content.st_containers.find(x => x.label === label);
             if (b) return `<div style="${getStyle(b.styles.refs[0])}">${b.content}</div>`;
             if (c) {
-                let html = `<div style="${getStyle(c.style_ref)}; border:1px solid rgba(255,255,255,0.2); padding:10px; margin:5px 0; width:90%; box-sizing:border-box;">`;
-                (c.children_refs || []).forEach(ref => html += getRecursiveHTML(ref));
-                return html + `</div>`;
+                let h = `<div style="${getStyle(c.style_ref)}; border:1px solid rgba(255,255,255,0.1); padding:10px; margin:5px 0; width:100%; box-sizing:border-box;">`;
+                (c.children_refs || []).forEach(r => h += getHTML(r));
+                return h + `</div>`;
             }
             return "";
         }
 
-        function updateLayoutPreview() {
-            const type = document.getElementById('select-template').value;
-            const area = document.getElementById('mapping-area'), viz = document.getElementById('layout-visualizer');
-            area.innerHTML = ""; viz.innerHTML = "";
-            viz.style.display = "grid";
-            const layouts = { "single": "1fr/1fr", "split-v": "1fr/1fr 1fr", "split-h": "1fr 1fr/1fr", "grid": "1fr 1fr/1fr 1fr" };
-            const [r, c] = layouts[type].split('/');
-            viz.style.gridTemplateRows = r; viz.style.gridTemplateColumns = c;
-
-            templates[type].forEach(z => {
-                area.innerHTML += `<small>${z}</small><select class="z-map" data-z="${z}" onchange="refreshViz()"><option value="">-</option>${db.project.content.st_bases.map(b => `<option>${b.label}</option>`).join('')}${db.project.content.st_containers.map(c => `<option>${c.label}</option>`).join('')}</select>`;
-                viz.innerHTML += `<div id="viz-${z}" class="viz-zone">${z}</div>`;
+        function initLayout() {
+            const t = document.getElementById('tpl-select').value, ml = document.getElementById('mapping-list'), lv = document.getElementById('layout-visualizer');
+            ml.innerHTML = ""; lv.innerHTML = "";
+            const grid = { "single": "1fr/1fr", "split-v": "1fr/1fr 1fr", "split-h": "1fr 1fr/1fr", "grid": "1fr 1fr/1fr 1fr" }[t];
+            lv.style.display = "grid"; lv.style.gridTemplateRows = grid.split('/')[0]; lv.style.gridTemplateColumns = grid.split('/')[1];
+            TPLS[t].forEach(z => {
+                ml.innerHTML += `<small>${z}</small><select class="z-sel" data-z="${z}" onchange="refreshViz()"><option value="">-</option>${db.project.content.st_bases.map(b => `<option>${b.label}</option>`).join('')}${db.project.content.st_containers.map(c => `<option>${c.label}</option>`).join('')}</select>`;
+                lv.innerHTML += `<div id="viz-${z}" class="viz-zone">${z}</div>`;
             });
         }
 
         function refreshViz() {
-            document.querySelectorAll('.z-map').forEach(sel => {
-                const z = sel.getAttribute('data-z'), val = sel.value, el = document.getElementById('viz-' + z);
-                if (!val) { el.innerHTML = z; el.style.background = "transparent"; return; }
-                el.innerHTML = getRecursiveHTML(val);
-                el.style.background = "#111";
+            document.querySelectorAll('.z-sel').forEach(s => {
+                const z = s.getAttribute('data-z'), v = s.value, el = document.getElementById('viz-' + z);
+                el.innerHTML = v ? getHTML(v) : z;
+                el.style.background = v ? "#050505" : "transparent";
             });
         }
 
-        function getStyle(ref) { if (!ref) return ""; const [l, k] = ref.split(':'); return (l
+        function getStyle(k) { return db.usr[k] ? (db.usr[k].css || db.usr[k]) : ""; }
+        function addStyle() { const id = document.getElementById('st-id').value, css = document.getElementById('st-css').value; if (id && css) { db.usr[id] = css; render(); } }
+        function addPal(k) { if (!db.project.content.palette.includes(k)) { db.project.content.palette.push(k); render(); } }
+        function remPal(k) { db.project.content.palette = db.project.content.palette.filter(x => x !== k); render(); }
+        function loadLib(i) { const r = new FileReader(); r.onload = (e) => { try { db.usr = JSON.parse(e.target.result); render(); } catch (err) { alert("Erreur Fichier Style"); } }; r.readAsText(i.files[0]); }
+        function exportProject() { const b = new Blob([JSON.stringify(db.project, null, 2)], { type: 'application/json' }); const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = "Projet_StoryTeller.json"; a.click(); }
+    </script>
+</body>
+
+</html>
