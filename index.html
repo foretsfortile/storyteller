@@ -294,11 +294,16 @@
             modified: false
         };
 
+        // --- MISE A JOUR : Rafraîchissement automatique du Layout ---
         function showPage(id) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('nav span').forEach(s => s.classList.remove('active'));
             document.getElementById(id).classList.add('active');
             document.getElementById('nav-' + id).classList.add('active');
+
+            // Si on va sur la mise en page, on rafraîchit les listes d'objets
+            if (id === 'page-layout') updateLayoutPreview();
+
             render();
         }
 
@@ -405,14 +410,24 @@
             db.modified = true; render();
         }
 
+        // --- MISE A JOUR : Création d'objet avec Nettoyage ---
         function createBase() {
             const label = document.getElementById('base-label').value;
             const content = document.getElementById('base-content').value;
             const styles = Array.from(document.querySelectorAll('.st-cb:checked')).map(c => c.value);
+
             if (!label) return alert("Label requis");
+
             db.project.content.st_bases.push({ label, content, styles: { refs: styles } });
-            db.modified = true; render();
-            alert("Objet ajouté !");
+            db.modified = true;
+
+            // NETTOYAGE DES CHAMPS
+            document.getElementById('base-label').value = "";
+            document.getElementById('base-content').value = "";
+            document.querySelectorAll('.st-cb').forEach(cb => cb.checked = false);
+
+            render();
+            alert("Objet ajouté au stock !");
         }
 
         function createContainer() {
@@ -492,13 +507,26 @@
             if (type === 'grid') viz.style.gridTemplateColumns = "1fr 1fr";
         }
 
+        // --- MISE A JOUR : Rendu visuel avec Styles dans le Layout ---
         function refreshVisualizer() {
             document.querySelectorAll('.zone-mapper').forEach(sel => {
                 const zone = sel.getAttribute('data-zone');
-                const val = sel.value;
+                const objectLabel = sel.value;
                 const vizZone = document.getElementById('viz-' + zone);
-                if (val) {
-                    vizZone.innerHTML = `<div style="color:var(--accent); font-weight:bold">${val}</div>`;
+
+                if (objectLabel) {
+                    // On retrouve l'objet complet dans l'inventaire
+                    const obj = db.project.content.st_bases.find(b => b.label === objectLabel);
+
+                    // On récupère le CSS du premier style de l'objet (pour le prototype)
+                    let styleCss = "";
+                    if (obj.styles.refs.length > 0) {
+                        const styleId = obj.styles.refs[0]; // ex: SYS:ALERTE
+                        const [lib, key] = styleId.split(':');
+                        styleCss = (lib === 'SYS') ? db.sys[key] : (db.usr[key] ? db.usr[key].css : "");
+                    }
+
+                    vizZone.innerHTML = `<div style="${styleCss}">${obj.content}</div>`;
                     vizZone.style.background = "#111";
                 } else {
                     vizZone.innerHTML = zone;
