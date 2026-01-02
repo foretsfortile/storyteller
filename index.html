@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>STORYTELLER - Établi v3.7</title>
+    <title>STORYTELLER - Établi v3.8</title>
     <style>
         :root {
             --bg: #0f0f0f;
@@ -189,7 +189,7 @@
 
     <header>
         <div style="font-size: 1.2rem; font-weight: bold; color: var(--accent);">STORYTELLER <span
-                style="font-weight: normal; color: #555;">v3.7</span></div>
+                style="font-weight: normal; color: #555;">v3.8</span></div>
         <div id="status-bar" style="font-size: 0.85rem;">
             Auteur: <span id="stat-user" style="color:var(--warning)">-</span> |
             Projet: <span id="stat-proj" style="color:var(--danger)">Aucun</span>
@@ -321,7 +321,7 @@
                 db.project = JSON.parse(e.target.result);
                 if (!db.project.content.st_containers) db.project.content.st_containers = [];
                 let auth = db.project.metadata.author;
-                document.getElementById('stat-user').innerText = (typeof auth === 'object') ? auth.name : auth;
+                document.getElementById('stat-user').innerText = (typeof auth === 'object') ? (auth.name || "Auteur") : auth;
                 document.getElementById('stat-proj').innerText = db.project.metadata.name;
                 document.getElementById('main-nav').classList.remove('hidden');
                 showPage('page-dash');
@@ -340,7 +340,8 @@
         function render() {
             if (!db.project) return;
             const auth = db.project.metadata.author;
-            document.getElementById('proj-details').innerHTML = `<b>Projet:</b> ${db.project.metadata.name}<br><b>Auteur:</b> ${(typeof auth === 'object') ? auth.name : auth}`;
+            const authName = (typeof auth === 'object') ? (auth.name || "Auteur") : auth;
+            document.getElementById('proj-details').innerHTML = `<b>Projet:</b> ${db.project.metadata.name}<br><b>Auteur:</b> ${authName}`;
 
             const palList = document.getElementById('list-palette'), baseStyles = document.getElementById('base-style-choices'), contSelect = document.getElementById('cont-style-select'), childCheck = document.getElementById('children-checklist');
             palList.innerHTML = ""; baseStyles.innerHTML = ""; childCheck.innerHTML = ""; contSelect.innerHTML = "<option value=''>-- Style --</option>";
@@ -358,15 +359,14 @@
             });
 
             const invList = document.getElementById('list-inv'); invList.innerHTML = "";
-            db.project.content.st_bases.forEach((b, i) => invList.innerHTML += `<div class="item"><span>[B] ${b.label}</span><div><button onclick="editObject('base', ${i})">✎</button><button class="btn-danger" onclick="deleteObject('base', ${i})">🗑️</button></div></div>`);
-            db.project.content.st_containers.forEach((c, i) => invList.innerHTML += `<div class="item"><span>[C] ${c.label}</span><div><button onclick="editObject('cont', ${i})">✎</button><button class="btn-danger" onclick="deleteObject('cont', ${i})">🗑️</button></div></div>`);
+            db.project.content.st_bases.forEach((b, i) => invList.innerHTML += `<div class="item"><span>[B] ${b.label}</span><div><button onclick="editObject('base', ${i})">✎</button><button class="btn-danger" style="margin-left:5px" onclick="deleteObject('base', ${i})">🗑️</button></div></div>`);
+            db.project.content.st_containers.forEach((c, i) => invList.innerHTML += `<div class="item"><span>[C] ${c.label}</span><div><button onclick="editObject('cont', ${i})">✎</button><button class="btn-danger" style="margin-left:5px" onclick="deleteObject('cont', ${i})">🗑️</button></div></div>`);
 
             const srcList = document.getElementById('list-sources'); srcList.innerHTML = "";
             Object.keys(db.sys).forEach(k => srcList.innerHTML += `<div class="item">SYS:${k} <button onclick="addToPal('SYS:${k}')">+</button></div>`);
             Object.keys(db.usr).forEach(k => srcList.innerHTML += `<div class="item">USR:${k} <button onclick="addToPal('USR:${k}')">+</button></div>`);
         }
 
-        // --- MOTEUR RÉCURSIF CORRIGÉ v3.7 ---
         function getRecursiveHTML(label) {
             const base = db.project.content.st_bases.find(b => b.label === label);
             const cont = db.project.content.st_containers.find(c => c.label === label);
@@ -391,10 +391,56 @@
 
         function getStyle(ref) { if (!ref) return ""; const [lib, key] = ref.split(':'); return (lib === 'SYS') ? db.sys[key] : (db.usr[key] ? (db.usr[key].css || db.usr[key]) : ""); }
         function deleteObject(type, i) { if (confirm("Supprimer?")) { if (type === 'base') db.project.content.st_bases.splice(i, 1); else db.project.content.st_containers.splice(i, 1); render(); } }
-        function editObject(type, i) { db.editing = { type, i }; const obj = (type === 'base') ? db.project.content.st_bases[i] : db.project.content.st_containers[i]; showPage('page-inv'); if (type === 'base') { document.getElementById('base-label').value = obj.label; document.getElementById('base-content').value = obj.content; document.getElementById('btn-cancel-base').classList.remove('hidden'); document.querySelectorAll('.st-cb').forEach(cb => cb.checked = obj.styles.refs.includes(cb.value)); } else { document.getElementById('cont-label').value = obj.label; document.getElementById('cont-style-select').value = obj.style_ref; document.getElementById('btn-cancel-cont').classList.remove('hidden'); document.querySelectorAll('.ch-cb').forEach(cb => cb.checked = obj.children_refs.includes(cb.value)); } }
-        function cancelEdit(t) { db.editing = null; if (t === 'base') { document.getElementById('base-label').value = ""; document.getElementById('base-content').value = ""; document.getElementById('btn-cancel-base').classList.add('hidden'); } else { document.getElementById('cont-label').value = ""; document.getElementById('btn-cancel-cont').classList.add('hidden'); } render(); }
-        function createBase() { const label = document.getElementById('base-label').value; const obj = { label, content: document.getElementById('base-content').value, styles: { refs: Array.from(document.querySelectorAll('.st-cb:checked')).map(c => c.value) } }; if (db.editing) db.project.content.st_bases[db.editing.i] = obj; else db.project.content.st_bases.push(obj); cancelEdit('base'); }
-        function createContainer() { const label = document.getElementById('cont-label').value; const obj = { label, style_ref: document.getElementById('cont-style-select').value, children_refs: Array.from(document.querySelectorAll('.ch-cb:checked')).map(c => c.value) }; if (db.editing) db.project.content.st_containers[db.editing.i] = obj; else db.project.content.st_containers.push(obj); cancelEdit('cont'); }
+
+        function editObject(type, i) {
+            db.editing = { type, index: i };
+            const obj = (type === 'base') ? db.project.content.st_bases[i] : db.project.content.st_containers[i];
+            showPage('page-inv');
+            if (type === 'base') {
+                document.getElementById('base-label').value = obj.label;
+                document.getElementById('base-content').value = obj.content;
+                document.getElementById('base-form-title').innerText = "Modifier Base";
+                document.getElementById('btn-cancel-base').classList.remove('hidden');
+                document.querySelectorAll('.st-cb').forEach(cb => cb.checked = obj.styles.refs.includes(cb.value));
+            } else {
+                document.getElementById('cont-label').value = obj.label;
+                document.getElementById('cont-style-select').value = obj.style_ref;
+                document.getElementById('cont-form-title').innerText = "Modifier Boîte";
+                document.getElementById('btn-cancel-cont').classList.remove('hidden');
+                document.querySelectorAll('.ch-cb').forEach(cb => cb.checked = obj.children_refs.includes(cb.value));
+            }
+        }
+
+        function cancelEdit(t) {
+            db.editing = null;
+            if (t === 'base') {
+                document.getElementById('base-label').value = ""; document.getElementById('base-content').value = "";
+                document.getElementById('base-form-title').innerText = "Créer ST_Base";
+                document.getElementById('btn-cancel-base').classList.add('hidden');
+            } else {
+                document.getElementById('cont-label').value = "";
+                document.getElementById('cont-form-title').innerText = "Créer ST_Container";
+                document.getElementById('btn-cancel-cont').classList.add('hidden');
+            }
+            render();
+        }
+
+        function createBase() {
+            const label = document.getElementById('base-label').value;
+            const obj = { label, content: document.getElementById('base-content').value, styles: { refs: Array.from(document.querySelectorAll('.st-cb:checked')).map(c => c.value) } };
+            if (db.editing && db.editing.type === 'base') db.project.content.st_bases[db.editing.index] = obj;
+            else db.project.content.st_bases.push(obj);
+            cancelEdit('base');
+        }
+
+        function createContainer() {
+            const label = document.getElementById('cont-label').value;
+            const obj = { label, style_ref: document.getElementById('cont-style-select').value, children_refs: Array.from(document.querySelectorAll('.ch-cb:checked')).map(c => c.value) };
+            if (db.editing && db.editing.type === 'cont') db.project.content.st_containers[db.editing.index] = obj;
+            else db.project.content.st_containers.push(obj);
+            cancelEdit('cont');
+        }
+
         function updateLayoutPreview() { const type = document.getElementById('select-template').value, mappingArea = document.getElementById('mapping-area'), visualizer = document.getElementById('layout-visualizer'); mappingArea.innerHTML = "<h5>Affectation :</h5>"; visualizer.innerHTML = ""; applyGridStyles(visualizer, type); templates[type].forEach(zone => { mappingArea.innerHTML += `<small>${zone}</small><select class="zone-mapper" data-zone="${zone}" onchange="refreshVisualizer()"><option value="">-- Vide --</option>${db.project.content.st_bases.map(b => `<option value="${b.label}">${b.label}</option>`).join('')}${db.project.content.st_containers.map(c => `<option value="${c.label}">${c.label}</option>`).join('')}</select>`; visualizer.innerHTML += `<div id="viz-${zone}" class="viz-zone">${zone}</div>`; }); }
         function applyGridStyles(el, t) { el.style.display = "grid"; const l = { "single": "1fr/1fr", "split-v": "1fr/1fr 1fr", "split-h": "1fr 1fr/1fr", "grid": "1fr 1fr/1fr 1fr" }; const [r, c] = l[t].split('/'); el.style.gridTemplateRows = r; el.style.gridTemplateColumns = c; }
         function addQuickStyle() { const id = document.getElementById('new-style-id').value, css = document.getElementById('new-style-css').value; if (id && css) { db.usr[id] = { css }; render(); resetStyleForm(); } }
