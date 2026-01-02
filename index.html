@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>STORYTELLER - Établi v3.8</title>
+    <title>STORYTELLER - Établi v3.9</title>
     <style>
         :root {
             --bg: #0f0f0f;
@@ -74,10 +74,6 @@
             transition: 0.2s;
         }
 
-        nav span:hover {
-            color: var(--accent);
-        }
-
         nav span.active {
             border-bottom: 2px solid var(--accent);
             color: var(--accent);
@@ -113,14 +109,9 @@
             cursor: pointer;
             border: none;
             border-radius: 4px;
-            padding: 10px 15px;
+            padding: 8px 12px;
             font-weight: bold;
             transition: 0.2s;
-            opacity: 0.9;
-        }
-
-        button:hover {
-            opacity: 1;
         }
 
         .btn-primary {
@@ -170,7 +161,8 @@
             padding: 10px;
             background: #000;
             height: 100%;
-            min-height: 350px;
+            min-height: 400px;
+            border: 2px solid #222;
         }
 
         .viz-zone {
@@ -189,7 +181,7 @@
 
     <header>
         <div style="font-size: 1.2rem; font-weight: bold; color: var(--accent);">STORYTELLER <span
-                style="font-weight: normal; color: #555;">v3.8</span></div>
+                style="font-weight: normal; color: #555;">v3.9</span></div>
         <div id="status-bar" style="font-size: 0.85rem;">
             Auteur: <span id="stat-user" style="color:var(--warning)">-</span> |
             Projet: <span id="stat-proj" style="color:var(--danger)">Aucun</span>
@@ -197,20 +189,20 @@
     </header>
 
     <nav id="main-nav" class="hidden">
-        <span onclick="showPage('page-dash')" id="nav-page-dash" class="active">Tableau de Bord</span>
+        <span onclick="showPage('page-dash')" id="nav-page-dash" class="active">Dashboard</span>
         <span onclick="showPage('page-env')" id="nav-page-env">Environnement</span>
         <span onclick="showPage('page-inv')" id="nav-page-inv">Inventaire</span>
         <span onclick="showPage('page-layout')" id="nav-page-layout">Mise en Page</span>
     </nav>
 
     <div id="page-auth" class="page active" style="align-items: center; justify-content: center;">
-        <div class="card" style="width: 450px;">
-            <h2 style="color:var(--accent); text-align: center;">Accès à l'Établi</h2>
-            <input type="file" id="file-selector" onchange="loadProject(this)"
-                style="border: 2px dashed var(--accent); padding: 20px;">
-            <div style="text-align: center; margin: 15px 0; color: #666;">— OU —</div>
-            <input type="text" id="user-name-init" placeholder="Nom de l'Auteur">
-            <button class="btn-primary" style="width:100%" onclick="initNewSession()">Nouveau Scénario</button>
+        <div class="card" style="width: 400px; text-align: center;">
+            <h2 style="color:var(--accent);">Accès Établi</h2>
+            <input type="file" onchange="loadProject(this)"
+                style="border: 2px dashed #444; padding: 20px; cursor: pointer;">
+            <p style="color:#666">-- OU --</p>
+            <input type="text" id="user-name-init" placeholder="Votre Nom">
+            <button class="btn-primary" style="width:100%" onclick="initNewSession()">Créer Nouveau Projet</button>
         </div>
     </div>
 
@@ -218,65 +210,58 @@
         <div class="grid-3" style="grid-template-columns: 1fr 2fr;">
             <div class="card">
                 <h3>Métadonnées</h3>
-                <div id="proj-details" style="line-height: 1.6; font-size: 0.9rem;"></div>
-                <button class="btn-success" style="width:100%; margin-top:20px" onclick="exportProject()">Exporter le
-                    Projet</button>
-            </div>
-            <div class="card">
-                <h3>Résumé</h3>
-                <div id="dash-stats"></div>
+                <p id="proj-details"></p>
+                <button class="btn-success" style="width:100%" onclick="exportProject()">Exporter JSON</button>
             </div>
         </div>
     </div>
 
     <div id="page-env" class="page">
         <div class="grid-3">
-            <div class="col card">
-                <h4>1. Biblio</h4>
-                <small>SYS :</small> <input type="file" onchange="loadLib(this, 'SYS')">
-                <small>USR :</small> <input type="file" onchange="loadLib(this, 'USR')">
+            <div class="card">
+                <h4>Bibliothèques</h4>
+                <small>Charger USR :</small><input type="file" onchange="loadLib(this, 'USR')">
                 <div id="list-sources" class="scroll-list"></div>
             </div>
-            <div class="col card">
-                <h4>2. Palette</h4>
+            <div class="card">
+                <h4>Palette Scénario</h4>
                 <div id="list-palette" class="scroll-list"></div>
             </div>
-            <div class="col card">
-                <h4>3. Style Rapide</h4>
+            <div class="card">
+                <h4>Style Rapide</h4>
                 <input type="text" id="new-style-id" placeholder="ID">
-                <textarea id="new-style-css" placeholder="CSS"></textarea>
-                <button class="btn-primary" style="width:100%" onclick="addQuickStyle()">Ajouter</button>
-                <button class="btn-primary" style="width:100%; background:#555; margin-top:5px;"
-                    onclick="resetStyleForm()">Vider</button>
+                <textarea id="new-style-css" placeholder="color: red;"></textarea>
+                <button class="btn-primary" onclick="addQuickStyle()">Ajouter</button>
+                <button class="btn-primary" style="background:#444" onclick="resetStyleForm()">Vider</button>
             </div>
         </div>
     </div>
 
     <div id="page-inv" class="page">
         <div class="grid-3">
-            <div class="col card">
+            <div class="card">
                 <h4 id="base-form-title">Créer ST_Base</h4>
                 <input type="text" id="base-label" placeholder="Label">
-                <textarea id="base-content" placeholder="Contenu"></textarea>
+                <textarea id="base-content" placeholder="Texte..."></textarea>
                 <div id="base-style-choices" class="scroll-list" style="max-height:100px"></div>
-                <button class="btn-success" style="width:100%; margin-top:10px" id="btn-save-base"
-                    onclick="createBase()">Sauvegarder</button>
-                <button class="btn-primary hidden" id="btn-cancel-base" onclick="cancelEdit('base')"
-                    style="width:100%; margin-top:5px; background:#555">Annuler</button>
+                <button class="btn-success" style="width:100%" onclick="saveBase()">Sauvegarder</button>
+                <button id="btn-cancel-base" class="hidden" style="width:100%; margin-top:5px;"
+                    onclick="cancelEdit('base')">Annuler</button>
             </div>
-            <div class="col card">
+            <div class="card">
                 <h4 id="cont-form-title">Créer ST_Container</h4>
-                <input type="text" id="cont-label" placeholder="Label">
+                <input type="text" id="cont-label" placeholder="Label de la boîte">
                 <select id="cont-style-select"></select>
                 <div class="scroll-list" style="max-height:150px; margin-top:10px;">
+                    <small>Contenu de la boîte :</small>
                     <div id="children-checklist"></div>
                 </div>
-                <button class="btn-success" style="width:100%; margin-top:10px" id="btn-save-cont"
-                    onclick="createContainer()">Sauvegarder</button>
-                <button class="btn-primary hidden" id="btn-cancel-cont" onclick="cancelEdit('cont')"
-                    style="width:100%; margin-top:5px; background:#555">Annuler</button>
+                <button class="btn-success" style="width:100%; margin-top:10px"
+                    onclick="saveContainer()">Sauvegarder</button>
+                <button id="btn-cancel-cont" class="hidden" style="width:100%; margin-top:5px;"
+                    onclick="cancelEdit('cont')">Annuler</button>
             </div>
-            <div class="col card">
+            <div class="card">
                 <h4>Stock Global</h4>
                 <div id="list-inv" class="scroll-list" style="max-height:450px"></div>
             </div>
@@ -285,8 +270,8 @@
 
     <div id="page-layout" class="page">
         <div class="grid-3">
-            <div class="col card">
-                <h4>Layout</h4>
+            <div class="card">
+                <h4>Template</h4>
                 <select id="select-template" onchange="updateLayoutPreview()">
                     <option value="single">Plein Écran</option>
                     <option value="split-v">Split V</option>
@@ -295,7 +280,7 @@
                 </select>
                 <div id="mapping-area" style="margin-top:20px;"></div>
             </div>
-            <div class="col card" style="grid-column: span 2;">
+            <div class="card" style="grid-column: span 2;">
                 <h4>Aperçu</h4>
                 <div id="layout-visualizer"></div>
             </div>
@@ -303,14 +288,15 @@
     </div>
 
     <script>
-        let db = { project: null, sys: {}, usr: {}, modified: false, editing: null };
-        const templates = { "single": ["Zone_Centrale"], "split-v": ["Gauche", "Droite"], "split-h": ["Haut", "Bas"], "grid": ["H_Gauche", "H_Droite", "B_Gauche", "B_Droite"] };
+        let db = { project: null, sys: { "NORMAL": "color:#d0d0d0;" }, usr: {}, editing: null };
+        const templates = { "single": ["Zone_Centrale"], "split-v": ["Gauche", "Droite"], "split-h": ["Haut", "Bas"], "grid": ["HG", "HD", "BG", "BD"] };
 
         function showPage(id) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('nav span').forEach(s => s.classList.remove('active'));
             document.getElementById(id).classList.add('active');
-            if (document.getElementById('nav-' + id)) document.getElementById('nav-' + id).classList.add('active');
+            const nav = document.getElementById('nav-' + id);
+            if (nav) nav.classList.add('active');
             if (id === 'page-layout') updateLayoutPreview();
             render();
         }
@@ -331,17 +317,17 @@
 
         function initNewSession() {
             const name = document.getElementById('user-name-init').value || "Auteur";
-            db.project = { metadata: { name: "Nouveau Scénario", author: name, id: "ST-" + Date.now() }, content: { palette: [], st_bases: [], st_containers: [] } };
+            db.project = { metadata: { name: "Projet_HAPPI", author: name }, content: { palette: [], st_bases: [], st_containers: [] } };
             document.getElementById('stat-user').innerText = name;
             document.getElementById('main-nav').classList.remove('hidden');
             showPage('page-dash');
         }
 
+        // --- MOTEUR DE RENDU ---
         function render() {
             if (!db.project) return;
             const auth = db.project.metadata.author;
-            const authName = (typeof auth === 'object') ? (auth.name || "Auteur") : auth;
-            document.getElementById('proj-details').innerHTML = `<b>Projet:</b> ${db.project.metadata.name}<br><b>Auteur:</b> ${authName}`;
+            document.getElementById('proj-details').innerHTML = `<b>Auteur:</b> ${(typeof auth === 'object') ? auth.name : auth}<br><b>Objets:</b> ${db.project.content.st_bases.length + db.project.content.st_containers.length}`;
 
             const palList = document.getElementById('list-palette'), baseStyles = document.getElementById('base-style-choices'), contSelect = document.getElementById('cont-style-select'), childCheck = document.getElementById('children-checklist');
             palList.innerHTML = ""; baseStyles.innerHTML = ""; childCheck.innerHTML = ""; contSelect.innerHTML = "<option value=''>-- Style --</option>";
@@ -352,45 +338,49 @@
                 contSelect.innerHTML += `<option value="${s}">${s}</option>`;
             });
 
+            // Liste des enfants pour Container (Bases + autres Containers)
             db.project.content.st_bases.forEach(b => childCheck.innerHTML += `<div><input type="checkbox" value="${b.label}" class="ch-cb"> [B] ${b.label}</div>`);
-            db.project.content.st_containers.forEach(c => {
-                if (db.editing && db.editing.type === 'cont' && db.project.content.st_containers[db.editing.index].label === c.label) return;
+            db.project.content.st_containers.forEach((c, idx) => {
+                if (db.editing && db.editing.type === 'cont' && db.editing.index === idx) return;
                 childCheck.innerHTML += `<div><input type="checkbox" value="${c.label}" class="ch-cb"> [C] ${c.label}</div>`;
             });
 
+            // Stock Global
             const invList = document.getElementById('list-inv'); invList.innerHTML = "";
             db.project.content.st_bases.forEach((b, i) => invList.innerHTML += `<div class="item"><span>[B] ${b.label}</span><div><button onclick="editObject('base', ${i})">✎</button><button class="btn-danger" style="margin-left:5px" onclick="deleteObject('base', ${i})">🗑️</button></div></div>`);
             db.project.content.st_containers.forEach((c, i) => invList.innerHTML += `<div class="item"><span>[C] ${c.label}</span><div><button onclick="editObject('cont', ${i})">✎</button><button class="btn-danger" style="margin-left:5px" onclick="deleteObject('cont', ${i})">🗑️</button></div></div>`);
 
+            // Biblio
             const srcList = document.getElementById('list-sources'); srcList.innerHTML = "";
             Object.keys(db.sys).forEach(k => srcList.innerHTML += `<div class="item">SYS:${k} <button onclick="addToPal('SYS:${k}')">+</button></div>`);
             Object.keys(db.usr).forEach(k => srcList.innerHTML += `<div class="item">USR:${k} <button onclick="addToPal('USR:${k}')">+</button></div>`);
         }
 
-        function getRecursiveHTML(label) {
-            const base = db.project.content.st_bases.find(b => b.label === label);
-            const cont = db.project.content.st_containers.find(c => c.label === label);
-            if (base) return `<div style="${getStyle(base.styles.refs[0])}">${base.content}</div>`;
-            if (cont) {
-                const cStyle = getStyle(cont.style_ref);
-                let html = `<div style="${cStyle}; border:1px solid rgba(255,255,255,0.1); padding:10px; width:95%; margin:5px 0; box-sizing:border-box;">`;
-                (cont.children_refs || []).forEach(child => html += getRecursiveHTML(child));
-                return html + `</div>`;
+        // --- LOGIQUE SAUVEGARDE STABLE ---
+        function saveBase() {
+            const obj = {
+                label: document.getElementById('base-label').value,
+                content: document.getElementById('base-content').value,
+                styles: { refs: Array.from(document.querySelectorAll('.st-cb:checked')).map(c => c.value) }
+            };
+            if (db.editing && db.editing.type === 'base') db.project.content.st_bases[db.editing.index] = obj;
+            else db.project.content.st_bases.push(obj);
+            cancelEdit('base');
+        }
+
+        function saveContainer() {
+            const obj = {
+                label: document.getElementById('cont-label').value,
+                style_ref: document.getElementById('cont-style-select').value,
+                children_refs: Array.from(document.querySelectorAll('.ch-cb:checked')).map(c => c.value)
+            };
+            if (db.editing && db.editing.type === 'cont') {
+                db.project.content.st_containers[db.editing.index] = obj;
+            } else {
+                db.project.content.st_containers.push(obj);
             }
-            return "";
+            cancelEdit('cont');
         }
-
-        function refreshVisualizer() {
-            document.querySelectorAll('.zone-mapper').forEach(sel => {
-                const zone = sel.getAttribute('data-zone'), vizZone = document.getElementById('viz-' + zone);
-                if (!sel.value) { vizZone.innerHTML = zone; vizZone.style.background = "transparent"; return; }
-                vizZone.innerHTML = getRecursiveHTML(sel.value);
-                vizZone.style.background = "#111";
-            });
-        }
-
-        function getStyle(ref) { if (!ref) return ""; const [lib, key] = ref.split(':'); return (lib === 'SYS') ? db.sys[key] : (db.usr[key] ? (db.usr[key].css || db.usr[key]) : ""); }
-        function deleteObject(type, i) { if (confirm("Supprimer?")) { if (type === 'base') db.project.content.st_bases.splice(i, 1); else db.project.content.st_containers.splice(i, 1); render(); } }
 
         function editObject(type, i) {
             db.editing = { type, index: i };
@@ -405,7 +395,7 @@
             } else {
                 document.getElementById('cont-label').value = obj.label;
                 document.getElementById('cont-style-select').value = obj.style_ref;
-                document.getElementById('cont-form-title').innerText = "Modifier Boîte";
+                document.getElementById('cont-form-title').innerText = "Modifier Container";
                 document.getElementById('btn-cancel-cont').classList.remove('hidden');
                 document.querySelectorAll('.ch-cb').forEach(cb => cb.checked = obj.children_refs.includes(cb.value));
             }
@@ -413,43 +403,55 @@
 
         function cancelEdit(t) {
             db.editing = null;
-            if (t === 'base') {
-                document.getElementById('base-label').value = ""; document.getElementById('base-content').value = "";
-                document.getElementById('base-form-title').innerText = "Créer ST_Base";
-                document.getElementById('btn-cancel-base').classList.add('hidden');
-            } else {
-                document.getElementById('cont-label').value = "";
-                document.getElementById('cont-form-title').innerText = "Créer ST_Container";
-                document.getElementById('btn-cancel-cont').classList.add('hidden');
-            }
+            document.getElementById('base-form-title').innerText = "Créer ST_Base";
+            document.getElementById('cont-form-title').innerText = "Créer ST_Container";
+            document.querySelectorAll('input[type=text], textarea').forEach(i => i.value = "");
+            document.querySelectorAll('.hidden').forEach(h => h.classList.add('hidden'));
             render();
         }
 
-        function createBase() {
-            const label = document.getElementById('base-label').value;
-            const obj = { label, content: document.getElementById('base-content').value, styles: { refs: Array.from(document.querySelectorAll('.st-cb:checked')).map(c => c.value) } };
-            if (db.editing && db.editing.type === 'base') db.project.content.st_bases[db.editing.index] = obj;
-            else db.project.content.st_bases.push(obj);
-            cancelEdit('base');
+        function deleteObject(type, i) {
+            if (!confirm("Supprimer l'objet ?")) return;
+            if (type === 'base') db.project.content.st_bases.splice(i, 1);
+            else db.project.content.st_containers.splice(i, 1);
+            render();
         }
 
-        function createContainer() {
-            const label = document.getElementById('cont-label').value;
-            const obj = { label, style_ref: document.getElementById('cont-style-select').value, children_refs: Array.from(document.querySelectorAll('.ch-cb:checked')).map(c => c.value) };
-            if (db.editing && db.editing.type === 'cont') db.project.content.st_containers[db.editing.index] = obj;
-            else db.project.content.st_containers.push(obj);
-            cancelEdit('cont');
+        // --- RENDU VISUEL ---
+        function getRecursiveHTML(label) {
+            const b = db.project.content.st_bases.find(x => x.label === label);
+            const c = db.project.content.st_containers.find(x => x.label === label);
+            if (b) return `<div style="${getStyle(b.styles.refs[0])}">${b.content}</div>`;
+            if (c) {
+                let html = `<div style="${getStyle(c.style_ref)}; border:1px solid rgba(255,255,255,0.2); padding:10px; margin:5px 0; width:90%; box-sizing:border-box;">`;
+                (c.children_refs || []).forEach(ref => html += getRecursiveHTML(ref));
+                return html + `</div>`;
+            }
+            return "";
         }
 
-        function updateLayoutPreview() { const type = document.getElementById('select-template').value, mappingArea = document.getElementById('mapping-area'), visualizer = document.getElementById('layout-visualizer'); mappingArea.innerHTML = "<h5>Affectation :</h5>"; visualizer.innerHTML = ""; applyGridStyles(visualizer, type); templates[type].forEach(zone => { mappingArea.innerHTML += `<small>${zone}</small><select class="zone-mapper" data-zone="${zone}" onchange="refreshVisualizer()"><option value="">-- Vide --</option>${db.project.content.st_bases.map(b => `<option value="${b.label}">${b.label}</option>`).join('')}${db.project.content.st_containers.map(c => `<option value="${c.label}">${c.label}</option>`).join('')}</select>`; visualizer.innerHTML += `<div id="viz-${zone}" class="viz-zone">${zone}</div>`; }); }
-        function applyGridStyles(el, t) { el.style.display = "grid"; const l = { "single": "1fr/1fr", "split-v": "1fr/1fr 1fr", "split-h": "1fr 1fr/1fr", "grid": "1fr 1fr/1fr 1fr" }; const [r, c] = l[t].split('/'); el.style.gridTemplateRows = r; el.style.gridTemplateColumns = c; }
-        function addQuickStyle() { const id = document.getElementById('new-style-id').value, css = document.getElementById('new-style-css').value; if (id && css) { db.usr[id] = { css }; render(); resetStyleForm(); } }
-        function resetStyleForm() { document.getElementById('new-style-id').value = ""; document.getElementById('new-style-css').value = ""; }
-        function addToPal(id) { if (!db.project.content.palette.includes(id)) { db.project.content.palette.push(id); render(); } }
-        function remFromPal(id) { db.project.content.palette = db.project.content.palette.filter(x => x !== id); render(); }
-        function loadLib(input, t) { const reader = new FileReader(); reader.onload = (e) => { if (t === 'SYS') db.sys = JSON.parse(e.target.result); else db.usr = JSON.parse(e.target.result); render(); }; reader.readAsText(input.files[0]); }
-        function exportProject() { const blob = new Blob([JSON.stringify(db.project, null, 2)], { type: 'application/json' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = db.project.metadata.name + ".json"; a.click(); }
-    </script>
-</body>
+        function updateLayoutPreview() {
+            const type = document.getElementById('select-template').value;
+            const area = document.getElementById('mapping-area'), viz = document.getElementById('layout-visualizer');
+            area.innerHTML = ""; viz.innerHTML = "";
+            viz.style.display = "grid";
+            const layouts = { "single": "1fr/1fr", "split-v": "1fr/1fr 1fr", "split-h": "1fr 1fr/1fr", "grid": "1fr 1fr/1fr 1fr" };
+            const [r, c] = layouts[type].split('/');
+            viz.style.gridTemplateRows = r; viz.style.gridTemplateColumns = c;
 
-</html>
+            templates[type].forEach(z => {
+                area.innerHTML += `<small>${z}</small><select class="z-map" data-z="${z}" onchange="refreshViz()"><option value="">-</option>${db.project.content.st_bases.map(b => `<option>${b.label}</option>`).join('')}${db.project.content.st_containers.map(c => `<option>${c.label}</option>`).join('')}</select>`;
+                viz.innerHTML += `<div id="viz-${z}" class="viz-zone">${z}</div>`;
+            });
+        }
+
+        function refreshViz() {
+            document.querySelectorAll('.z-map').forEach(sel => {
+                const z = sel.getAttribute('data-z'), val = sel.value, el = document.getElementById('viz-' + z);
+                if (!val) { el.innerHTML = z; el.style.background = "transparent"; return; }
+                el.innerHTML = getRecursiveHTML(val);
+                el.style.background = "#111";
+            });
+        }
+
+        function getStyle(ref) { if (!ref) return ""; const [l, k] = ref.split(':'); return (l
