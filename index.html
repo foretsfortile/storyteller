@@ -3,136 +3,186 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>STORYTELLER - v4.9 Recovery</title>
+    <title>HAPPI - STORYTELLER v5.0 (Restored)</title>
     <style>
         :root {
-            --bg: #0f0f0f;
-            --panel: #1a1a1a;
+            --bg: #0d0d0d;
+            --panel: #161616;
             --accent: #00aaff;
-            --text: #d0d0d0;
-            --success: #27ae60;
+            --text: #e0e0e0;
+            --success: #2ecc71;
             --danger: #e74c3c;
             --warning: #f1c40f;
+            --border: #333;
         }
 
         body {
-            font-family: 'Segoe UI', sans-serif;
+            font-family: 'Segoe UI', Tahoma, sans-serif;
             background: var(--bg);
             color: var(--text);
             margin: 0;
-            overflow: hidden;
-            height: 100vh;
             display: flex;
             flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
         }
 
+        /* Layout Structure */
         header {
             background: #000;
-            padding: 10px 20px;
+            padding: 15px 25px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             border-bottom: 2px solid var(--accent);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
         }
 
         nav {
             background: #111;
-            padding: 5px 20px;
+            padding: 0 20px;
             display: flex;
-            gap: 20px;
-            font-size: 0.9rem;
-            border-bottom: 1px solid #333;
+            gap: 10px;
+            border-bottom: 1px solid var(--border);
         }
 
         nav span {
+            padding: 12px 20px;
             cursor: pointer;
-            padding: 10px;
-            color: #666;
-            transition: 0.2s;
-            border-bottom: 2px solid transparent;
+            color: #777;
+            transition: 0.3s;
+            border-bottom: 3px solid transparent;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        nav span:hover {
+            color: #bbb;
         }
 
         nav span.active {
             color: var(--accent);
             border-bottom-color: var(--accent);
-            font-weight: bold;
+            background: rgba(0, 170, 255, 0.05);
         }
 
         .page {
             display: none;
             flex-grow: 1;
-            padding: 20px;
+            padding: 25px;
             overflow-y: auto;
+            animation: fadeIn 0.3s ease;
         }
 
         .page.active {
             display: block;
         }
 
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* UI Elements */
         .card {
             background: var(--panel);
             border-radius: 8px;
             padding: 20px;
-            border: 1px solid #333;
+            border: 1px solid var(--border);
             margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        h3,
+        h4 {
+            margin-top: 0;
+            color: var(--accent);
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+        }
+
+        .grid-main {
+            display: grid;
+            grid-template-columns: 350px 1fr 300px;
+            gap: 20px;
+            height: 100%;
+        }
+
+        .scroll-area {
+            background: #0a0a0a;
+            border-radius: 6px;
+            border: 1px solid #222;
+            overflow-y: auto;
+            padding: 10px;
         }
 
         input,
         textarea,
         select {
             width: 100%;
-            background: #000;
+            background: #050505;
             border: 1px solid #444;
-            color: white;
+            color: #fff;
             padding: 10px;
             margin: 8px 0;
             border-radius: 4px;
-            box-sizing: border-box;
+            font-size: 0.9rem;
+            transition: border 0.3s;
+        }
+
+        input:focus,
+        textarea:focus {
+            border-color: var(--accent);
+            outline: none;
         }
 
         button {
             cursor: pointer;
             border: none;
             border-radius: 4px;
-            padding: 8px 12px;
+            padding: 10px 15px;
             font-weight: bold;
             transition: 0.2s;
+            font-size: 0.85rem;
         }
 
         .btn-primary {
             background: var(--accent);
-            color: white;
+            color: #000;
         }
 
         .btn-success {
             background: var(--success);
-            color: white;
+            color: #000;
         }
 
         .btn-danger {
             background: var(--danger);
-            color: white;
+            color: #fff;
         }
 
-        .grid-3 {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 15px;
+        .btn-ghost {
+            background: transparent;
+            border: 1px solid #444;
+            color: #aaa;
         }
 
-        .scroll-list {
-            background: #0a0a0a;
-            border-radius: 6px;
-            padding: 10px;
-            overflow-y: auto;
-            max-height: 380px;
-            border: 1px solid #333;
+        .btn-ghost:hover {
+            border-color: #666;
+            color: #fff;
         }
 
-        .item {
+        /* Object Items */
+        .obj-item {
             background: #222;
-            margin-bottom: 5px;
-            padding: 8px;
+            padding: 10px;
+            margin-bottom: 8px;
             border-radius: 4px;
             display: flex;
             justify-content: space-between;
@@ -140,29 +190,48 @@
             border-left: 4px solid transparent;
         }
 
-        .item-b {
+        .obj-item.base {
             border-left-color: var(--success);
         }
 
-        .item-c {
+        .obj-item.cont {
             border-left-color: var(--accent);
         }
 
-        #layout-visualizer {
+        .obj-item:hover {
+            background: #2a2a2a;
+        }
+
+        /* Preview Area */
+        #layout-viz {
             display: grid;
             gap: 15px;
-            padding: 15px;
             background: #000;
             min-height: 500px;
-            border: 1px solid #333;
+            border: 1px solid var(--border);
+            padding: 15px;
+            border-radius: 8px;
         }
 
         .viz-zone {
-            border: 1px dashed #444;
-            padding: 10px;
+            border: 1px dashed #333;
+            display: flex;
+            flex-direction: column;
+            position: relative;
             min-height: 100px;
-            color: #555;
-            overflow: auto;
+        }
+
+        .viz-label {
+            position: absolute;
+            top: 2px;
+            left: 5px;
+            font-size: 0.7rem;
+            color: #444;
+            pointer-events: none;
+        }
+
+        .hidden {
+            display: none;
         }
     </style>
 </head>
@@ -170,249 +239,358 @@
 <body>
 
     <header>
-        <div style="font-size: 1.2rem; font-weight: bold; color: var(--accent);">STORYTELLER <span
-                style="font-weight: normal; color: #444;">v4.9</span></div>
-        <div id="stat-proj" style="color:var(--warning)">Projet non chargé</div>
+        <div style="display:flex; align-items:center; gap:15px;">
+            <span style="font-size: 1.4rem; font-weight: 800; color: var(--accent); letter-spacing: -1px;">HAPPI <span
+                    style="font-weight: 300; color: #fff;">STORYTELLER</span></span>
+            <span id="proj-name-display"
+                style="background: #222; padding: 4px 10px; border-radius: 4px; font-size: 0.8rem; color: var(--warning);">Aucun
+                projet</span>
+        </div>
+        <div id="header-tools" class="hidden">
+            <button class="btn-success" onclick="exportProject()">SAUVEGARDER PROJET</button>
+        </div>
     </header>
 
     <nav id="main-nav" class="hidden">
-        <span onclick="showPage('page-dash')" id="nav-page-dash">Projet</span>
-        <span onclick="showPage('page-env')" id="nav-page-env">Styles</span>
-        <span onclick="showPage('page-inv')" id="nav-page-inv">Inventaire</span>
-        <span onclick="showPage('page-layout')" id="nav-page-layout">Mise en Page</span>
+        <span onclick="goTo('page-dash')" id="nav-page-dash">TABLEAU DE BORD</span>
+        <span onclick="goTo('page-env')" id="nav-page-env">BIBLIOTHÈQUE & STYLES</span>
+        <span onclick="goTo('page-inv')" id="nav-page-inv">INVENTAIRE OBJETS</span>
+        <span onclick="goTo('page-layout')" id="nav-page-layout">MISE EN SCÈNE</span>
     </nav>
 
     <div id="page-auth" class="page active">
-        <div style="max-width: 500px; margin: 50px auto;" class="card">
-            <h2>Démarrage</h2>
-            <input type="file" onchange="loadProject(this)">
-            <hr style="border:0; border-top:1px solid #333; margin:20px 0;">
-            <input type="text" id="init-author" placeholder="Votre nom">
-            <button class="btn-primary" style="width:100%" onclick="initNew()">Nouveau Projet</button>
+        <div style="max-width: 500px; margin: 80px auto;">
+            <div class="card" style="text-align: center;">
+                <h3 style="font-size: 1.2rem; margin-bottom: 20px;">Accès au Système</h3>
+                <label style="display: block; margin-bottom: 10px; color: #888;">Charger un fichier .json
+                    existant</label>
+                <input type="file" id="file-input" onchange="handleFile(this)"
+                    style="border: 2px dashed #444; padding: 30px; cursor: pointer;">
+                <div style="margin: 30px 0; color: #444;">— OU —</div>
+                <input type="text" id="new-author" placeholder="Nom de l'auteur / Producteur">
+                <button class="btn-primary" style="width: 100%; padding: 15px;" onclick="createNewProject()">CRÉER UN
+                    NOUVEAU SCÉNARIO</button>
+            </div>
         </div>
     </div>
 
     <div id="page-dash" class="page">
-        <div class="card" style="max-width: 400px;">
-            <h3>Projet Actif</h3>
-            <p id="details-box"></p>
-            <button class="btn-success" onclick="exportProject()" style="width:100%">Exporter JSON</button>
+        <div class="grid-main" style="grid-template-columns: 1fr 1fr 1fr;">
+            <div class="card">
+                <h3>Métadonnées</h3>
+                <div id="dash-meta" style="line-height: 2;"></div>
+            </div>
+            <div class="card">
+                <h3>Statistiques Contenu</h3>
+                <div id="dash-stats" style="line-height: 2;"></div>
+            </div>
+            <div class="card">
+                <h3>Actions rapides</h3>
+                <button class="btn-ghost" style="width: 100%; margin-bottom: 10px;" onclick="goTo('page-inv')">Ajouter
+                    un élément</button>
+                <button class="btn-ghost" style="width: 100%;" onclick="exportProject()">Exporter pour HAPPI</button>
+            </div>
         </div>
     </div>
 
     <div id="page-env" class="page">
-        <div class="grid-3">
+        <div class="grid-main">
             <div class="card">
-                <h4>Bibliothèque</h4>
-                <input type="file" onchange="loadLib(this)">
-                <div id="list-lib" class="scroll-list"></div>
+                <h3>Bibliothèque USR</h3>
+                <p style="font-size: 0.8rem; color: #666;">Importez vos thèmes CSS partagés.</p>
+                <input type="file" onchange="importLibrary(this)">
+                <div id="lib-content" class="scroll-area" style="height: 400px; margin-top:15px;"></div>
             </div>
             <div class="card">
-                <h4>Palette</h4>
-                <div id="list-pal" class="scroll-list"></div>
+                <h3>Palette du Scénario</h3>
+                <p style="font-size: 0.8rem; color: #666;">Styles actuellement disponibles pour vos objets.</p>
+                <div id="palette-content" class="scroll-area" style="height: 400px;"></div>
             </div>
             <div class="card">
-                <h4>Créer Style</h4>
-                <input type="text" id="st-id" placeholder="ID (ex: TITRE)">
-                <textarea id="st-css" style="height:100px"
-                    placeholder="background: #333; color: gold; padding: 10px;"></textarea>
-                <button class="btn-primary" style="width:100%" onclick="addStyle()">Ajouter</button>
+                <h3>Éditeur de Style</h3>
+                <input type="text" id="edit-st-id" placeholder="ID du style (ex: ALERTE_ROUGE)">
+                <textarea id="edit-st-css" style="height: 200px;"
+                    placeholder="color: red; font-weight: bold; ..."></textarea>
+                <button class="btn-primary" style="width:100%" onclick="saveCustomStyle()">ENREGISTRER STYLE</button>
             </div>
         </div>
     </div>
 
     <div id="page-inv" class="page">
-        <div class="grid-3">
+        <div class="grid-main">
             <div class="card">
-                <h4>ST_Base (Texte)</h4>
-                <input type="text" id="b-label" placeholder="Nom">
-                <textarea id="b-txt" style="height:120px" placeholder="Contenu..."></textarea>
-                <div id="b-styles" class="scroll-list" style="height: 100px;"></div>
-                <button class="btn-success" onclick="saveObj('base')" style="width:100%; margin-top:10px;">Enregistrer
-                    Base</button>
+                <h3 id="inv-form-title">Créer une Base (Texte)</h3>
+                <input type="text" id="b-label" placeholder="Label de l'objet">
+                <textarea id="b-content" style="height: 150px;" placeholder="Texte, HTML ou variable..."></textarea>
+                <h4>Style appliqué</h4>
+                <div id="b-style-list" class="scroll-area" style="height: 150px;"></div>
+                <button class="btn-success" style="width:100%; margin-top: 15px;"
+                    onclick="commitObject('base')">ENREGISTRER LA BASE</button>
             </div>
             <div class="card">
-                <h4>ST_Container (Boîte)</h4>
-                <input type="text" id="c-label" placeholder="Nom">
-                <select id="c-style-sel"></select>
-                <div id="c-children" class="scroll-list" style="height: 180px; margin-top:10px;"></div>
-                <button class="btn-success" onclick="saveObj('cont')" style="width:100%; margin-top:10px;">Enregistrer
-                    Boîte</button>
+                <h3>Créer une Boîte (Container)</h3>
+                <input type="text" id="c-label" placeholder="Nom du container">
+                <h4>Style de la boîte</h4>
+                <select id="c-style-select"></select>
+                <h4>Objets enfants (imbrication)</h4>
+                <div id="c-child-list" class="scroll-area" style="height: 200px;"></div>
+                <button class="btn-success" style="width:100%; margin-top: 15px;"
+                    onclick="commitObject('cont')">ENREGISTRER LA BOÎTE</button>
             </div>
             <div class="card">
-                <h4>Tous les objets</h4>
-                <div id="full-inv" class="scroll-list" style="max-height: 450px;"></div>
-                <button class="btn-primary" style="width:100%; margin-top:10px; background:#444;"
-                    onclick="resetForms()">Mode Création</button>
+                <h3>Stockage Global</h3>
+                <div id="global-inventory" class="scroll-area" style="height: 450px;"></div>
+                <button class="btn-ghost" style="width:100%; margin-top: 15px;" onclick="resetForms()">+ NOUVEL OBJET
+                    VIDE</button>
             </div>
         </div>
     </div>
 
     <div id="page-layout" class="page">
-        <div class="grid-3">
+        <div class="grid-main" style="grid-template-columns: 350px 1fr;">
             <div class="card">
-                <h4>Configuration</h4>
-                <select id="tpl-sel" onchange="updateTpl(this.value)">
-                    <option value="single">Plein Écran</option>
-                    <option value="split-v">Split Vertical</option>
-                    <option value="split-h">Split Horizontal</option>
-                    <option value="grid">Grille 2x2</option>
+                <h3>Structure de l'écran</h3>
+                <select id="layout-type-sel" onchange="changeLayout(this.value)">
+                    <option value="single">Plein Écran (1 zone)</option>
+                    <option value="split-v">Division Verticale (2 zones)</option>
+                    <option value="split-h">Division Horizontale (2 zones)</option>
+                    <option value="grid">Grille (4 zones)</option>
                 </select>
-                <div id="mapping-list" style="margin-top:20px"></div>
+                <hr border="0" style="border-top: 1px solid #333; margin: 20px 0;">
+                <h3>Affectation des zones</h3>
+                <div id="mapping-controls"></div>
             </div>
-            <div class="card" style="grid-column: span 2;">
-                <div id="layout-visualizer"></div>
-            </div>
+            <div id="layout-viz"></div>
         </div>
     </div>
 
     <script>
-        let db = { project: null, usr: {}, editingId: null };
-        const TPLS = { "single": ["Centre"], "split-v": ["Gauche", "Droite"], "split-h": ["Haut", "Bas"], "grid": ["HG", "HD", "BG", "BD"] };
+        // --- MOTEUR DE DONNÉES ---
+        let state = {
+            project: null,
+            usr_lib: {}, // Bibliothèque de styles importée
+            editing_id: null
+        };
 
-        function showPage(id) {
+        const LAYOUT_TPLS = {
+            "single": { zones: ["Centre"], grid: "1fr / 1fr" },
+            "split-v": { zones: ["Gauche", "Droite"], grid: "1fr / 1fr 1fr" },
+            "split-h": { zones: ["Haut", "Bas"], grid: "1fr 1fr / 1fr" },
+            "grid": { zones: ["HG", "HD", "BG", "BD"], grid: "1fr 1fr / 1fr 1fr" }
+        };
+
+        // --- NAVIGATION ---
+        function goTo(pageId) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('nav span').forEach(s => s.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-            if (document.getElementById('nav-' + id)) document.getElementById('nav-' + id).classList.add('active');
-            if (id === 'page-layout') initLayoutUI();
-            render();
+            document.getElementById(pageId).classList.add('active');
+            if (document.getElementById('nav-' + pageId)) document.getElementById('nav-' + pageId).classList.add('active');
+            refreshUI();
         }
 
-        function initNew() {
-            db.project = { metadata: { name: "Projet", author: document.getElementById('init-author').value || "Inconnu" }, content: { palette: [], st_bases: [], st_containers: [] }, layout: { type: 'single', mapping: {} } };
-            finishLoad();
-        }
-
-        function loadProject(input) {
-            const r = new FileReader();
-            r.onload = (e) => {
-                db.project = JSON.parse(e.target.result);
-                finishLoad();
+        // --- INITIALISATION ---
+        function createNewProject() {
+            const author = document.getElementById('new-author').value || "Auteur";
+            state.project = {
+                metadata: { name: "Nouveau Scénario", author: author, version: "1.0" },
+                content: { palette: [], st_bases: [], st_containers: [] },
+                layout: { type: "single", mapping: {} }
             };
-            r.readAsText(input.files[0]);
+            onProjectLoaded();
         }
 
-        function finishLoad() {
-            document.getElementById('stat-proj').innerText = "Projet : " + db.project.metadata.name;
+        function handleFile(input) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    state.project = JSON.parse(e.target.result);
+                    // Patch pour les vieilles versions
+                    if (!state.project.layout) state.project.layout = { type: "single", mapping: {} };
+                    onProjectLoaded();
+                } catch (err) { alert("Erreur de lecture du fichier JSON."); }
+            };
+            reader.readAsText(input.files[0]);
+        }
+
+        function onProjectLoaded() {
+            document.getElementById('proj-name-display').innerText = state.project.metadata.name;
             document.getElementById('main-nav').classList.remove('hidden');
-            showPage('page-dash');
+            document.getElementById('header-tools').classList.remove('hidden');
+            goTo('page-dash');
         }
 
-        function render() {
-            if (!db.project) return;
-            document.getElementById('details-box').innerText = `Bases : ${db.project.content.st_bases.length} | Boîtes : ${db.project.content.st_containers.length}`;
-
-            // Sync Styles UI
-            const lp = document.getElementById('list-pal'), bs = document.getElementById('b-styles'), cs = document.getElementById('c-style-sel');
-            lp.innerHTML = ""; bs.innerHTML = ""; cs.innerHTML = "<option value=''>-- Style --</option>";
-            db.project.content.palette.forEach(s => {
-                lp.innerHTML += `<div class="item">${s} <button onclick="remPal('${s}')">x</button></div>`;
-                bs.innerHTML += `<div><input type="checkbox" value="${s}" class="bs-cb"> ${s}</div>`;
-                cs.innerHTML += `<option value="${s}">${s}</option>`;
-            });
-
-            // Sync Objects UI
-            const cc = document.getElementById('c-children'); cc.innerHTML = "";
-            db.project.content.st_bases.forEach(b => cc.innerHTML += `<div><input type="checkbox" value="${b.id}" class="cc-cb"> [B] ${b.label}</div>`);
-            db.project.content.st_containers.forEach(c => { if (db.editingId !== c.id) cc.innerHTML += `<div><input type="checkbox" value="${c.id}" class="cc-cb"> [C] ${c.label}</div>`; });
-
-            const fi = document.getElementById('full-inv'); fi.innerHTML = "";
-            db.project.content.st_bases.forEach(b => fi.innerHTML += `<div class="item item-b"><span>${b.label}</span><div><button onclick="editObj('base','${b.id}')">✎</button><button class="btn-danger" onclick="delObj('base','${b.id}')">🗑️</button></div></div>`);
-            db.project.content.st_containers.forEach(c => fi.innerHTML += `<div class="item item-c"><span>${c.label}</span><div><button onclick="editObj('cont','${c.id}')">✎</button><button class="btn-danger" onclick="delObj('cont','${c.id}')">🗑️</button></div></div>`);
-
-            const ll = document.getElementById('list-lib'); ll.innerHTML = "";
-            Object.keys(db.usr).forEach(k => ll.innerHTML += `<div class="item">${k} <button onclick="addPal('${k}')">+</button></div>`);
-        }
-
-        function saveObj(type) {
+        // --- LOGIQUE METIER : OBJETS ---
+        function commitObject(type) {
+            const id = state.editing_id || "obj_" + Date.now();
             const label = document.getElementById(type === 'base' ? 'b-label' : 'c-label').value;
-            if (!label) return;
-            const id = db.editingId || "id_" + Date.now();
+            if (!label) return alert("Le label est obligatoire.");
 
             if (type === 'base') {
-                const obj = { id, label, content: document.getElementById('b-txt').value, styles: { refs: Array.from(document.querySelectorAll('.bs-cb:checked')).map(c => c.value) } };
-                const i = db.project.content.st_bases.findIndex(x => x.id === id);
-                if (i > -1) db.project.content.st_bases[i] = obj; else db.project.content.st_bases.push(obj);
+                const selectedStyles = Array.from(document.querySelectorAll('.style-cb:checked')).map(cb => cb.value);
+                const obj = { id, label, content: document.getElementById('b-content').value, styles: { refs: selectedStyles } };
+                updateOrPush(state.project.content.st_bases, obj);
             } else {
-                const obj = { id, label, style_ref: document.getElementById('c-style-sel').value, children_ids: Array.from(document.querySelectorAll('.cc-cb:checked')).map(c => c.value) };
-                const i = db.project.content.st_containers.findIndex(x => x.id === id);
-                if (i > -1) db.project.content.st_containers[i] = obj; else db.project.content.st_containers.push(obj);
+                const selectedChildren = Array.from(document.querySelectorAll('.child-cb:checked')).map(cb => cb.value);
+                const obj = { id, label, style_ref: document.getElementById('c-style-select').value, children_ids: selectedChildren };
+                updateOrPush(state.project.content.st_containers, obj);
             }
             resetForms();
+            refreshUI();
         }
 
-        function editObj(type, id) {
-            resetForms();
-            db.editingId = id;
-            const obj = type === 'base' ? db.project.content.st_bases.find(x => x.id === id) : db.project.content.st_containers.find(x => x.id === id);
-            if (!obj) return;
+        function updateOrPush(array, obj) {
+            const idx = array.findIndex(item => item.id === obj.id);
+            if (idx !== -1) array[idx] = obj; else array.push(obj);
+        }
 
-            if (type === 'base') {
-                document.getElementById('b-label').value = obj.label;
-                document.getElementById('b-txt').value = obj.content;
-            } else {
-                document.getElementById('c-label').value = obj.label;
-                document.getElementById('c-style-sel').value = obj.style_ref || "";
+        function editObject(id) {
+            state.editing_id = id;
+            const base = state.project.content.st_bases.find(x => x.id === id);
+            const cont = state.project.content.st_containers.find(x => x.id === id);
+
+            goTo('page-inv'); // Switch view
+
+            if (base) {
+                document.getElementById('b-label').value = base.label;
+                document.getElementById('b-content').value = base.content;
+                // Cocher les styles
+                setTimeout(() => {
+                    document.querySelectorAll('.style-cb').forEach(cb => cb.checked = base.styles.refs.includes(cb.value));
+                }, 50);
+            } else if (cont) {
+                document.getElementById('c-label').value = cont.label;
+                document.getElementById('c-style-select').value = cont.style_ref || "";
+                // Cocher les enfants
+                setTimeout(() => {
+                    document.querySelectorAll('.child-cb').forEach(cb => cb.checked = cont.children_ids.includes(cb.value));
+                }, 50);
             }
-            render();
-            setTimeout(() => {
-                if (type === 'base') {
-                    const refs = obj.styles ? obj.styles.refs : [];
-                    document.querySelectorAll('.bs-cb').forEach(cb => cb.checked = refs.includes(cb.value));
-                } else {
-                    const children = obj.children_ids || [];
-                    document.querySelectorAll('.cc-cb').forEach(cb => cb.checked = children.includes(cb.value));
-                }
-            }, 100);
         }
 
-        function delObj(type, id) { if (confirm("Supprimer ?")) { if (type === 'base') db.project.content.st_bases = db.project.content.st_bases.filter(x => x.id !== id); else db.project.content.st_containers = db.project.content.st_containers.filter(x => x.id !== id); render(); } }
-        function resetForms() { db.editingId = null; document.querySelectorAll('input[type=text], textarea, select').forEach(i => i.value = ""); render(); }
+        function deleteObject(type, id) {
+            if (!confirm("Supprimer définitivement cet objet ?")) return;
+            if (type === 'base') state.project.content.st_bases = state.project.content.st_bases.filter(x => x.id !== id);
+            else state.project.content.st_containers = state.project.content.st_containers.filter(x => x.id !== id);
+            refreshUI();
+        }
 
-        function updateTpl(v) { db.project.layout.type = v; initLayoutUI(); }
-        function initLayoutUI() {
-            const t = db.project.layout.type || 'single';
-            const ml = document.getElementById('mapping-list'), lv = document.getElementById('layout-visualizer');
-            ml.innerHTML = ""; lv.innerHTML = "";
-            const grid = { "single": "1fr/1fr", "split-v": "1fr/1fr 1fr", "split-h": "1fr 1fr/1fr", "grid": "1fr 1fr/1fr 1fr" }[t];
-            lv.style.display = "grid"; lv.style.gridTemplateRows = grid.split('/')[0]; lv.style.gridTemplateColumns = grid.split('/')[1];
+        function resetForms() {
+            state.editing_id = null;
+            document.querySelectorAll('#page-inv input[type=text], #page-inv textarea, #page-inv select').forEach(el => el.value = "");
+            document.querySelectorAll('#page-inv input[type=checkbox]').forEach(el => el.checked = false);
+        }
 
-            TPLS[t].forEach(z => {
-                const sid = db.project.layout.mapping[z] || "";
-                ml.innerHTML += `<div><small>${z}</small><select onchange="updateMap('${z}', this.value)">
+        // --- LOGIQUE METIER : STYLES ---
+        function saveCustomStyle() {
+            const id = document.getElementById('edit-st-id').value;
+            const css = document.getElementById('edit-st-css').value;
+            if (!id || !css) return;
+            state.usr_lib[id] = css;
+            if (!state.project.content.palette.includes(id)) state.project.content.palette.push(id);
+            refreshUI();
+        }
+
+        function importLibrary(input) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const lib = JSON.parse(e.target.result);
+                state.usr_lib = { ...state.usr_lib, ...lib };
+                refreshUI();
+            };
+            reader.readAsText(input.files[0]);
+        }
+
+        // --- RENDU UI & VISUALISATION ---
+        function refreshUI() {
+            if (!state.project) return;
+
+            // Dash
+            document.getElementById('dash-meta').innerHTML = `Auteur: <b>${state.project.metadata.author}</b><br>Version: ${state.project.metadata.version}`;
+            document.getElementById('dash-stats').innerHTML = `Bases: ${state.project.content.st_bases.length}<br>Boîtes: ${state.project.content.st_containers.length}`;
+
+            // Env & Styles
+            const libDiv = document.getElementById('lib-content');
+            libDiv.innerHTML = Object.keys(state.usr_lib).map(k => `<div class="obj-item"><span>${k}</span> <button class="btn-primary" onclick="addToPalette('${k}')">+</button></div>`).join('');
+
+            const palDiv = document.getElementById('palette-content');
+            palDiv.innerHTML = state.project.content.palette.map(k => `<div class="obj-item"><span>${k}</span> <button class="btn-danger" onclick="removeFromPalette('${k}')">x</button></div>`).join('');
+
+            // Inv : Styles list for Base
+            document.getElementById('b-style-list').innerHTML = state.project.content.palette.map(k => `<div><input type="checkbox" value="${k}" class="style-cb"> ${k}</div>`).join('');
+
+            // Inv : Select for Container
+            const cSel = document.getElementById('c-style-select');
+            cSel.innerHTML = '<option value="">-- Aucun --</option>' + state.project.content.palette.map(k => `<option value="${k}">${k}</option>`).join('');
+
+            // Inv : Child list for Container
+            const childList = document.getElementById('c-child-list');
+            childList.innerHTML = state.project.content.st_bases.map(b => `<div><input type="checkbox" value="${b.id}" class="child-cb"> [B] ${b.label}</div>`).join('');
+            childList.innerHTML += state.project.content.st_containers.map(c => (c.id !== state.editing_id) ? `<div><input type="checkbox" value="${c.id}" class="child-cb"> [C] ${c.label}</div>` : '').join('');
+
+            // Inv : Global List
+            const glob = document.getElementById('global-inventory');
+            glob.innerHTML = state.project.content.st_bases.map(b => `<div class="obj-item base"><span><b>[B]</b> ${b.label}</span><div><button class="btn-ghost" onclick="editObject('${b.id}')">✎</button><button class="btn-ghost" onclick="deleteObject('base','${b.id}')">🗑️</button></div></div>`).join('');
+            glob.innerHTML += state.project.content.st_containers.map(c => `<div class="obj-item cont"><span><b>[C]</b> ${c.label}</span><div><button class="btn-ghost" onclick="editObject('${c.id}')">✎</button><button class="btn-ghost" onclick="deleteObject('cont','${c.id}')">🗑️</button></div></div>`).join('');
+
+            // Layout UI
+            if (document.getElementById('page-layout').classList.contains('active')) renderLayoutEngine();
+        }
+
+        function renderLayoutEngine() {
+            const tplKey = state.project.layout.type;
+            const tpl = LAYOUT_TPLS[tplKey];
+            const viz = document.getElementById('layout-viz');
+            const ctrl = document.getElementById('mapping-controls');
+
+            viz.style.gridTemplate = tpl.grid;
+            viz.innerHTML = "";
+            ctrl.innerHTML = "";
+
+            tpl.zones.forEach(z => {
+                const currentId = state.project.layout.mapping[z] || "";
+                // Control
+                ctrl.innerHTML += `<div style="margin-bottom:15px;"><label style="font-size:0.7rem; color:#888;">ZONE ${z}</label>
+                <select onchange="mapZone('${z}', this.value)">
                     <option value="">-- Vide --</option>
-                    ${db.project.content.st_bases.map(b => `<option value="${b.id}" ${sid === b.id ? 'selected' : ''}>[B] ${b.label}</option>`).join('')}
-                    ${db.project.content.st_containers.map(c => `<option value="${c.id}" ${sid === c.id ? 'selected' : ''}>[C] ${c.label}</option>`).join('')}
+                    ${state.project.content.st_bases.map(b => `<option value="${b.id}" ${currentId === b.id ? 'selected' : ''}>[B] ${b.label}</option>`).join('')}
+                    ${state.project.content.st_containers.map(c => `<option value="${c.id}" ${currentId === c.id ? 'selected' : ''}>[C] ${c.label}</option>`).join('')}
                 </select></div>`;
-                lv.innerHTML += `<div class="viz-zone">${sid ? getRecursiveHTML(sid) : z}</div>`;
+
+                // Viz
+                const html = currentId ? getRecursiveHTML(currentId) : `<span style="color:#222; font-weight:bold;">${z}</span>`;
+                viz.innerHTML += `<div class="viz-zone" id="zone-${z}"><div class="viz-label">${z}</div>${html}</div>`;
             });
         }
 
-        function updateMap(z, id) { db.project.layout.mapping[z] = id; initLayoutUI(); }
         function getRecursiveHTML(id) {
-            const b = db.project.content.st_bases.find(x => x.id === id);
-            const c = db.project.content.st_containers.find(x => x.id === id);
-            if (b) {
-                const style = b.styles && b.styles.refs ? getStyleCSS(b.styles.refs[0]) : "";
-                return `<div style="${style}">${b.content || b.label}</div>`;
+            const base = state.project.content.st_bases.find(x => x.id === id);
+            const cont = state.project.content.st_containers.find(x => x.id === id);
+
+            if (base) {
+                const styleStr = (base.styles && base.styles.refs) ? base.styles.refs.map(r => state.usr_lib[r] || "").join(';') : "";
+                return `<div style="${styleStr}">${base.content}</div>`;
             }
-            if (c) {
-                const style = getStyleCSS(c.style_ref);
-                let h = `<div style="${style}; border:1px solid #333; padding:5px;">`;
-                (c.children_ids || []).forEach(cid => h += getRecursiveHTML(cid));
-                return h + "</div>";
+            if (cont) {
+                const styleStr = state.usr_lib[cont.style_ref] || "";
+                let inner = (cont.children_ids || []).map(cid => getRecursiveHTML(cid)).join('');
+                return `<div style="${styleStr}; border:1px solid rgba(255,255,255,0.1);">${inner}</div>`;
             }
             return "";
         }
 
-        function getStyleCSS(k) { if (!k) return ""; return db.usr[k] ? (db.usr[k].css || db.usr[k]) : ""; }
-        function addStyle() { const id = document.getElementById('st-id').value, css = document.getElementById('st-css').value; if (id && css) { db.usr[id] = css; render(); } }
-        function addPal(k) { if (!db.project.content.palette.includes(k)) { db.project.content.palette.push(k); render(); } }
-        function remPal(k) { db.project.content.palette = db.project.content.palette.filter(x => x !== k); render(); }
-        function loadLib(i) { const r = new FileReader(); r.onload = (e) => { db.usr = JSON.parse(e.target.result); render(); }; r.readAsText(i.files[0]); }
-        function exportProject() { const b = new Blob([JSON.stringify(db.project, null, 2)], { type: 'application/json' }); const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = "Projet_V49.json"; a.click(); }
+        function mapZone(zone, id) { state.project.layout.mapping[zone] = id; refreshUI(); }
+        function changeLayout(val) { state.project.layout.type = val; refreshUI(); }
+        function addToPalette(k) { if (!state.project.content.palette.includes(k)) state.project.content.palette.push(k); refreshUI(); }
+        function removeFromPalette(k) { state.project.content.palette = state.project.content.palette.filter(x => x !== k); refreshUI(); }
+        function exportProject() {
+            const blob = new Blob([JSON.stringify(state.project, null, 2)], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = state.project.metadata.name + ".json";
+            a.click();
+        }
     </script>
+
 </body>
 
 </html>
