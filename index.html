@@ -148,6 +148,22 @@
             align-items: center;
             font-size: 0.85rem;
         }
+
+        /* Styles pour le visualiseur de Layout */
+        .viz-zone {
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .viz-zone:hover {
+            background: rgba(0, 170, 255, 0.1);
+        }
+
+        #layout-visualizer {
+            display: grid;
+            gap: 10px;
+            padding: 10px;
+        }
     </style>
 </head>
 
@@ -166,6 +182,7 @@
         <span onclick="showPage('page-dash')" id="nav-page-dash" class="active">Tableau de Bord</span>
         <span onclick="showPage('page-env')" id="nav-page-env">Environnement (Palette)</span>
         <span onclick="showPage('page-inv')" id="nav-page-inv">Inventaire</span>
+        <span onclick="showPage('page-layout')" id="nav-page-layout">Mise en Page</span>
     </nav>
 
     <div id="page-auth" class="page active" style="align-items: center; justify-content: center;">
@@ -244,6 +261,31 @@
         </div>
     </div>
 
+    <div id="page-layout" class="page">
+        <div class="grid-3">
+            <div class="col card">
+                <h4>1. Choisir un Gabarit</h4>
+                <select id="select-template" onchange="updateLayoutPreview()">
+                    <option value="single">Plein Écran (1 zone)</option>
+                    <option value="split-h">Split Horizontal (2 zones)</option>
+                    <option value="split-v">Split Vertical (2 zones)</option>
+                    <option value="grid">Grille (4 zones)</option>
+                </select>
+                <div id="mapping-area" style="margin-top:20px;">
+                </div>
+            </div>
+
+            <div class="col card" style="grid-column: span 2;">
+                <h4>2. Aperçu du Fond de Scène</h4>
+                <div id="layout-visualizer"
+                    style="background:#000; border:2px solid #444; height:400px; position:relative; overflow:hidden;">
+                </div>
+                <button class="btn-success" style="margin-top:10px; width:100%" onclick="saveFrame()">Enregistrer cette
+                    Frame</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         let db = {
             project: null,
@@ -261,24 +303,50 @@
         }
 
         function loadProject(input) {
+            // 1. Vérification de sécurité : y a-t-il bien un fichier ?
+            if (!input.files || input.files.length === 0) {
+                console.warn("Aucun fichier sélectionné.");
+                return;
+            }
+
+            const file = input.files[0];
             const reader = new FileReader();
+
             reader.onload = (e) => {
                 try {
                     let data = JSON.parse(e.target.result);
-                    // Initialisation des champs manquants pour compatibilité
+
+                    // Initialisation des champs si manquants (Compatibilité CanalBox)
+                    if (!data.content) data.content = {};
                     if (!data.content.palette) data.content.palette = [];
+                    if (!data.content.st_bases) data.content.st_bases = [];
+                    if (!data.content.st_containers) data.content.st_containers = [];
+
                     db.project = data;
 
-                    const authorName = (typeof data.metadata.author === 'object') ? data.metadata.author.name : data.metadata.author;
+                    // Gestion de l'objet auteur (nom ou dictionnaire)
+                    const authorName = (data.metadata && data.metadata.author && typeof data.metadata.author === 'object')
+                        ? data.metadata.author.name
+                        : (data.metadata ? data.metadata.author : "Auteur Inconnu");
+
                     document.getElementById('stat-user').innerText = authorName;
-                    document.getElementById('stat-proj').innerText = data.metadata.name;
+                    document.getElementById('stat-proj').innerText = data.metadata.name || "Sans titre";
                     document.getElementById('stat-proj').style.color = "var(--success)";
 
+                    // Déverrouillage de l'interface
                     document.getElementById('main-nav').classList.remove('hidden');
                     showPage('page-dash');
-                } catch (err) { alert("Erreur de lecture JSON : " + err); }
+                    render();
+
+                    console.log("Projet chargé avec succès :", data.metadata.name);
+                } catch (err) {
+                    alert("Erreur de lecture du JSON : " + err.message);
+                    console.error("Détail erreur JSON:", err);
+                }
             };
-            reader.readAsText(input.files[0]);
+
+            // 2. L'exécution de la lecture
+            reader.readAsText(file);
         }
 
         function initNewSession() {
@@ -375,6 +443,75 @@
         }
 
         window.onbeforeunload = () => db.modified ? "Modifs non sauvées" : null;
+
+        const templates = {
+            "single": ["Zone_Centrale"],
+            "split-h": ["Haut", "Bas"],
+            "split-v": ["Gauche", "Droite"],
+            "grid": ["Haut_Gauche", "Haut_Droite", "Bas_Gauche", "Bas_Droite"]
+        };
+
+        function updateLayoutPreview() {
+            const type = document.getElementById('select-template').value;
+            const mappingArea = document.getElementById('mapping-area');
+            const visualizer = document.getElementById('layout-visualizer');
+
+            mappingArea.innerHTML = "<h5>Assignation :</h5>";
+            visualizer.innerHTML = "";
+            visualizer.className = "layout-grid-" + type; // Pour le CSS futur
+
+            templates[type].forEach(zone => {
+                // Création du sélecteur pour chaque zone
+                let html = `<div style="margin-bottom:10px">
+                <small>${zone} :</small>
+                <select class="zone-mapper" data-zone="${zone}" onchange="refreshVisualizer()">
+                    <option value="">-- Vide --</option>`;
+
+                // On puise dans l'inventaire
+                db.project.content.st_bases.forEach(obj => {
+                    html += `<option value="${obj.label}">${obj.label}</option>`;
+                });
+                html += `</select></div>`;
+                mappingArea.innerHTML += html;
+
+                // Création de la zone visuelle dans l'aperçu
+                visualizer.innerHTML += `<div id="viz-${zone}" class="viz-zone" style="border:1px dashed #555; display:flex; align-items:center; justify-content:center; color:#444">
+                ${zone}
+            </div>`;
+            });
+
+            applyTemplateStyles(type);
+        }
+
+        function applyTemplateStyles(type) {
+            const viz = document.getElementById('layout-visualizer');
+            viz.style.display = "grid";
+            if (type === 'single') viz.style.gridTemplateColumns = "1fr";
+            if (type === 'split-v') viz.style.gridTemplateColumns = "1fr 1fr";
+            if (type === 'split-h') { viz.style.gridTemplateColumns = "1fr"; viz.style.gridTemplateRows = "1fr 1fr"; }
+            if (type === 'grid') viz.style.gridTemplateColumns = "1fr 1fr";
+        }
+
+        function refreshVisualizer() {
+            document.querySelectorAll('.zone-mapper').forEach(sel => {
+                const zone = sel.getAttribute('data-zone');
+                const val = sel.value;
+                const vizZone = document.getElementById('viz-' + zone);
+                if (val) {
+                    vizZone.innerHTML = `<div style="color:var(--accent); font-weight:bold">${val}</div>`;
+                    vizZone.style.background = "#111";
+                } else {
+                    vizZone.innerHTML = zone;
+                    vizZone.style.background = "transparent";
+                }
+            });
+        }
+
+        function saveFrame() {
+            alert("Frame enregistrée dans le projet (Logique de stockage à finaliser)");
+            db.modified = true;
+        }
+
     </script>
 </body>
 
